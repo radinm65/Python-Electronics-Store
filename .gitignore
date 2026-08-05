@@ -1,14 +1,24 @@
-# Virtual environment
-venv/
-.env
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# IDE
+# Virtual environment (if you add one later)
+venv/
+env/
+.venv/
+
+# IDE settings
 .vscode/
 .idea/
 
-# Python cache
-__pycache__/
-*.pyc
+# OS generated files
+.DS_Store
+Thumbs.db
 
 # Generated reports
-*.xlsx
+Reports/*.xlsx
+
+# Temporary files
+*.log

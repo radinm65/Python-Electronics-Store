@@ -170,12 +170,14 @@ def fire_employee(employee_type):
 
 def give_employee_raise(employee_type):
     try:
+        success = False
         emp_id = input("\nEnter Customer Employee ID to Give Raise:\n")
         if employee_type == "customer":
 
             if CustomerManager.check_employee_byID(emp_id):
                 salary_raise = int(input("How much raise?\n"))
                 CustomerManager.raise_salary(emp_id, salary_raise)
+                success = True
             else:
                 print(colorama.Fore.RED)
                 print("No Such ID Was Found", colorama.Fore.WHITE)
@@ -185,13 +187,13 @@ def give_employee_raise(employee_type):
             if SellerManager.check_employee_byID(emp_id):
                 salary_raise = int(input("How much raise?\n"))
                 SellerManager.raise_salary(emp_id, salary_raise)
-
+                success = True
             else:
                 print(colorama.Fore.RED)
                 print("No Such ID Was Found", colorama.Fore.WHITE)
-
-        print(colorama.Fore.GREEN)
-        print(f"{employee_type} Employee was given a raise!")
+        if success:
+            print(colorama.Fore.GREEN)
+            print(f"{employee_type} Employee was given a raise!")
 
     except Exception as e:
         print(colorama.Fore.RED)
@@ -234,23 +236,24 @@ def show_all_users(employee_type):
         users = CustomerEmployee.get_customers()
     elif employee_type == "seller":
         users = SellerEmployee.get_sellers()
-    if len(users) == 0:
-        print(colorama.Fore.RED)
-        print(f"No {employee_type}s have been registered.", colorama.Fore.WHITE)
+        if len(users) == 0:
+            print(colorama.Fore.RED)
+            print(f"No {employee_type}s have been registered.")
+            return
     for user in users:
         print(colorama.Fore.BLUE)
         print(
-            f"ID: {user["id"]}\n"
-            f"Firstname: {user["firstname"]}\n"
-            f"Lastname: {user["lastname"]}\n"
-            f"Username: {user["username"]}\n"
+            f"ID: {user['id']}\n"
+            f"Firstname: {user['firstname']}\n"
+            f"Lastname: {user['lastname']}\n"
+            f"Username: {user['username']}\n"
             f"Password: *********\n"
-            f"Age: {user["age"]}\n"
-            f"Phone_num: {user["phone_num"]}\n"
-            f"Address: {user["address"]}\n"
-            f"Bank account Number: {user["bank_account_num"]}\n"
-            f"Date Hired: {user["date_hired"]}\n"
-            f"Salary: {user["salary"]}\n"
+            f"Age: {user['age']}\n"
+            f"Phone_num: {user['phone_num']}\n"
+            f"Address: {user['address']}\n"
+            f"Bank account Number: {user['bank_account_num']}\n"
+            f"Date Hired: {user['date_hired']}\n"
+            f"Salary: {user['salary']}\n"
         )
     print(colorama.Fore.WHITE)
 
@@ -267,7 +270,7 @@ def generate_top5_report(employee_type):
                 print(colorama.Fore.RED)
                 print(e, colorama.Fore.WHITE)
     elif employee_type == "seller":
-        if len(SellerEmployee.get_customers()) < 5:
+        if len(SellerEmployee.get_sellers()) < 5:
             print(colorama.Fore.RED)
             print("Not enough data for report to generate.", colorama.Fore.WHITE)
         else:

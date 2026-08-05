@@ -1,1 +1,47 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "iPhone Pro",
+    "brand": "Apple",
+    "price": 45000,
+    "category": "Phone",
+    "seller_id": 1,
+    "date_created": "2026-08-01T10:30:00"
+  },
+  {
+    "id": 2,
+    "name": "Galaxy Book",
+    "brand": "Samsung",
+    "price": 38000,
+    "category": "Laptop",
+    "seller_id": 2,
+    "date_created": "2026-08-02T12:15:00"
+  },
+  {
+    "id": 3,
+    "name": "EOS Camera",
+    "brand": "Canon",
+    "price": 52000,
+    "category": "Camera",
+    "seller_id": 3,
+    "date_created": "2026-08-03T09:45:00"
+  },
+  {
+    "id": 4,
+    "name": "Pixel Phone",
+    "brand": "Google",
+    "price": 33000,
+    "category": "Phone",
+    "seller_id": 4,
+    "date_created": "2026-08-04T14:20:00"
+  },
+  {
+    "id": 5,
+    "name": "ThinkPad Laptop",
+    "brand": "Lenovo",
+    "price": 41000,
+    "category": "Laptop",
+    "seller_id": 5,
+    "date_created": "2026-08-05T16:10:00"
+  }
+]

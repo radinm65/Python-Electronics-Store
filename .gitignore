@@ -1,0 +1,14 @@
+# Virtual environment
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated reports
+*.xlsx

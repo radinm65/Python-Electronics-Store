@@ -73,29 +73,12 @@ def show_seller_employee_manager_menu():
     )
 
 
-# Show Panels ----------------------
+# Fuctions and Methods -----------------------------------------------------------------------------------
+
+# Joined Managers Functions -----------------------
 
 
-def customers_panel(customer):
-    pass
-
-
-def sellers_panel(seller):
-    pass
-
-
-def customer_employee_panel(customer_employee):
-    pass
-
-
-def seller_employee_panel(seller_employee):
-    pass
-
-
-# Fuctions and Methods -----------------------------
-
-
-def hire_customer_employee():
+def hire_employee(employee_type):
     try:
         print(colorama.Fore.RED)
         print("Enter 'e' on first input to exit\n", colorama.Fore.WHITE)
@@ -132,197 +115,248 @@ def hire_customer_employee():
         salary = int(input("Enter Salary:\n"))
         Validator.validate_salary(salary)
 
-        CustomerManager.hire_employee(
-            firstname,
-            lastname,
-            username,
-            password,
-            age,
-            phone_num,
-            address,
-            bank_account_num,
-            salary,
-        )
-        print(colorama.Fore.GREEN)
-        print("Customer Employee has Been Hired Successfully!", colorama.Fore.WHITE)
+        if employee_type == "customer":
+            CustomerManager.hire_employee(
+                firstname,
+                lastname,
+                username,
+                password,
+                age,
+                phone_num,
+                address,
+                bank_account_num,
+                salary,
+            )
+            print(colorama.Fore.GREEN)
+            print("Customer Employee has Been Hired Successfully!", colorama.Fore.WHITE)
+
+        elif employee_type == "seller":
+            SellerManager.hire_employee(
+                firstname,
+                lastname,
+                username,
+                password,
+                age,
+                phone_num,
+                address,
+                bank_account_num,
+                salary,
+            )
+            print(colorama.Fore.GREEN)
+            print("Seller Employee has Been Hired Successfully!", colorama.Fore.WHITE)
         return True
+
     except ValueError as e:
         print(colorama.Fore.RED)
         print(e, colorama.Fore.WHITE)
+        return False
 
 
-def fire_customer_employee():
+def fire_employee(employee_type):
     try:
-        emp_id = input("\nEnter Customer Employee ID to Fire:\n")
-        if CustomerManager.fire_employee(emp_id):
-            print(colorama.Fore.GREEN)
-            print("Customer Employee is Fired!")
+        emp_id = input(f"\nEnter {employee_type} Employee ID to Fire:\n")
+        if employee_type == "customer":
+            if CustomerManager.fire_employee(emp_id):
+                print(colorama.Fore.GREEN)
+                print("Customer Employee is Fired!")
+        elif employee_type == "seller":
+            if SellerManager.fire_employee(emp_id):
+                print(colorama.Fore.GREEN)
+                print("Seller Employee is Fired!")
     except Exception as e:
         print(colorama.Fore.RED)
         print(e, colorama.Fore.WHITE)
 
 
-def give_raise_customer_employee():
+def give_employee_raise(employee_type):
     try:
         emp_id = input("\nEnter Customer Employee ID to Give Raise:\n")
-        if CustomerManager.check_employee_byID(emp_id):
-            salary_raise = int(input("How much raise?\n"))
-            CustomerManager.raise_salary()
-            print(colorama.Fore.GREEN)
-            print("Customer Employee is Fired!")
-        else:
-            print(colorama.Fore.RED)
-            print("No Such ID Was Found", colorama.Fore.WHITE)
+        if employee_type == "customer":
+
+            if CustomerManager.check_employee_byID(emp_id):
+                salary_raise = int(input("How much raise?\n"))
+                CustomerManager.raise_salary(emp_id, salary_raise)
+            else:
+                print(colorama.Fore.RED)
+                print("No Such ID Was Found", colorama.Fore.WHITE)
+
+        elif employee_type == "seller":
+
+            if SellerManager.check_employee_byID(emp_id):
+                salary_raise = int(input("How much raise?\n"))
+                SellerManager.raise_salary(emp_id, salary_raise)
+
+            else:
+                print(colorama.Fore.RED)
+                print("No Such ID Was Found", colorama.Fore.WHITE)
+
+        print(colorama.Fore.GREEN)
+        print(f"{employee_type} Employee was given a raise!")
+
     except Exception as e:
         print(colorama.Fore.RED)
         print(e, colorama.Fore.WHITE)
 
 
-def show_all_customer_employees():
-    CEs = CustomerManager.get_customer_employees()
-    if len(CEs) == 0:
+def show_all_employees(employee_type):
+    if employee_type == "customer":
+        employees = CustomerManager.get_customer_employees()
+
+    elif employee_type == "seller":
+        employees = SellerManager.get_seller_employees()
+
+    if len(employees) == 0:
         print(colorama.Fore.RED)
-        print("No Customer Employees have been registered.", colorama.Fore.WHITE)
-    for ce in CEs:
+        print(f"No {employee_type} employees have been registered.")
+        return
+
+    for emp in employees:
         print(colorama.Fore.BLUE)
         print(
-            f"ID: {ce["id"]}\n"
-            f"Firstname: {ce["firstname"]}\n"
-            f"Lastname: {ce["lastname"]}\n"
-            f"Username: {ce["username"]}\n"
+            f"ID: {emp['id']}\n"
+            f"Firstname: {emp['firstname']}\n"
+            f"Lastname: {emp['lastname']}\n"
+            f"Username: {emp['username']}\n"
             f"Password: *********\n"
-            f"Age: {ce["age"]}\n"
-            f"Phone_num: {ce["phone_num"]}\n"
-            f"Address: {ce["address"]}\n"
-            f"Bank account Number: {ce["bank_account_num"]}\n"
-            f"Date Hired: {ce["date_hired"]}\n"
-            f"Salary: {ce["salary"]}\n"
+            f"Age: {emp['age']}\n"
+            f"Phone_num: {emp['phone_num']}\n"
+            f"Address: {emp['address']}\n"
+            f"Bank account Number: {emp['bank_account_num']}\n"
+            f"Date Hired: {emp['date_hired']}\n"
+            f"Salary: {emp['salary']}\n"
+        )
+
+    print(colorama.Fore.WHITE)
+
+
+def show_all_users(employee_type):
+    if employee_type == "customer":
+        users = CustomerEmployee.get_customers()
+    elif employee_type == "seller":
+        users = SellerEmployee.get_sellers()
+    if len(users) == 0:
+        print(colorama.Fore.RED)
+        print(f"No {employee_type}s have been registered.", colorama.Fore.WHITE)
+    for user in users:
+        print(colorama.Fore.BLUE)
+        print(
+            f"ID: {user["id"]}\n"
+            f"Firstname: {user["firstname"]}\n"
+            f"Lastname: {user["lastname"]}\n"
+            f"Username: {user["username"]}\n"
+            f"Password: *********\n"
+            f"Age: {user["age"]}\n"
+            f"Phone_num: {user["phone_num"]}\n"
+            f"Address: {user["address"]}\n"
+            f"Bank account Number: {user["bank_account_num"]}\n"
+            f"Date Hired: {user["date_hired"]}\n"
+            f"Salary: {user["salary"]}\n"
         )
     print(colorama.Fore.WHITE)
 
 
-def show_all_customers():
-    customers = CustomerEmployee.get_customers()
-    if len(customers) == 0:
-        print(colorama.Fore.RED)
-        print("No Customers have been registered.", colorama.Fore.WHITE)
-    for c in customers:
-        print(colorama.Fore.BLUE)
-        print(
-            f"ID: {c["id"]}\n"
-            f"Firstname: {c["firstname"]}\n"
-            f"Lastname: {c["lastname"]}\n"
-            f"Username: {c["username"]}\n"
-            f"Password: *********\n"
-            f"Age: {c["age"]}\n"
-            f"Phone_num: {c["phone_num"]}\n"
-            f"Address: {c["address"]}\n"
-            f"Bank account Number: {c["bank_account_num"]}\n"
-            f"Date Hired: {c["date_hired"]}\n"
-            f"Salary: {c["salary"]}\n"
-        )
-    print(colorama.Fore.WHITE)
-    
-def generate_top5_customers_report():
-    if len(CustomerEmployee.get_customers()) < 5:
-        print(colorama.Fore.RED)
-        print("Not enough data for report to generate.", colorama.Fore.WHITE)
-    else:
-        try:
-            Report.generate_top_customers_report()
-        except Exception as e:
+def generate_top5_report(employee_type):
+    if employee_type == "customer":
+        if len(CustomerEmployee.get_customers()) < 5:
             print(colorama.Fore.RED)
-            print(e, colorama.Fore.WHITE) 
-            
-            
-def show_account_info(customersManager):
+            print("Not enough data for report to generate.", colorama.Fore.WHITE)
+        else:
+            try:
+                Report.generate_top_customers_report()
+            except Exception as e:
+                print(colorama.Fore.RED)
+                print(e, colorama.Fore.WHITE)
+    elif employee_type == "seller":
+        if len(SellerEmployee.get_customers()) < 5:
+            print(colorama.Fore.RED)
+            print("Not enough data for report to generate.", colorama.Fore.WHITE)
+        else:
+            try:
+                Report.generate_top_sellers_report()
+            except Exception as e:
+                print(colorama.Fore.RED)
+                print(e, colorama.Fore.WHITE)
+
+
+def show_manager_account_info(manager):
     print(colorama.Fore.BLUE)
     print(
-        f"Firstname: {customersManager.firstname}\n" 
-        f"Lastname: {customersManager.lastname}\n" 
-        f"Username: {customersManager.username}\n" 
-        f"Age: {customersManager.age}\n" 
-        f"Phone_num: {customersManager.phone_num}\n" 
-        f"Address: {customersManager.address}\n", 
-        colorama.Fore.WHITE
+        f"Firstname: {manager.firstname}\n"
+        f"Lastname: {manager.lastname}\n"
+        f"Username: {manager.username}\n"
+        f"Age: {manager.age}\n"
+        f"Phone_num: {manager.phone_num}\n"
+        f"Address: {manager.address}\n",
+        colorama.Fore.WHITE,
     )
 
 
-def customer_employee_manager_panel(customersManager):
-    while True:
-        print(colorama.Fore.GREEN)
-        print(
-            f"Welcome Customer Manager {customersManager.firstname} {customersManager.lastname}!",
-            colorama.Fore.WHITE,
-        )
-        show_customer_employee_manager_menu()
-        choice = input("Please Choose:\n")
-
-        match choice:
-            case "1":
-                while True:
-                    if hire_customer_employee() == True:
-                        break
-            case "2":
-                fire_customer_employee()
-                pass
-            case "3":
-                give_raise_customer_employee()
-            case "4":
-                show_all_customer_employees()
-            case "5":
-                show_all_customers()
-            case "6":
-                generate_top5_customers_report()
-            case "7":
-                show_account_info(customersManager)
-            case "8":
-                break
-            case _:
-                print(colorama.Fore.RED)
-                print("Please only choose from options", colorama.Fore.WHITE)
+# Panels -----------------------------------------------------------------
 
 
-
-
-def seller_employee_manager_panel(customersManager):
-    while True:
-        print(colorama.Fore.GREEN)
-        print(
-            f"Welcome Customer Manager {customersManager.firstname} {customersManager.lastname}!",
-            colorama.Fore.WHITE,
-        )
-        show_customer_employee_manager_menu()
-        choice = input("Please Choose:\n")
-
-        match choice:
-            case "1":
-                while True:
-                    if hire_customer_employee() == True:
-                        break
-            case "2":
-                fire_customer_employee()
-                pass
-            case "3":
-                give_raise_customer_employee()
-            case "4":
-                show_all_customer_employees()
-            case "5":
-                show_all_customers()
-            case "6":
-                generate_top5_customers_report()
-            case "7":
-                show_account_info(customersManager)
-            case "8":
-                break
-            case _:
-                print(colorama.Fore.RED)
-                print("Please only choose from options", colorama.Fore.WHITE)
-                
-                
-
-def seller_employee_manager_panel(sellersManager):
+def customers_panel(customer):
     pass
+
+
+def sellers_panel(seller):
+    pass
+
+
+def customer_employee_panel(customer_employee):
+    pass
+
+
+def seller_employee_panel(seller_employee):
+    pass
+
+
+def show_employee_manager_panel(manager, employee_type):
+    while True:
+        print(colorama.Fore.GREEN)
+        print(
+            f"Welcome {employee_type.capitalize()} Manager "
+            f"{manager.firstname} {manager.lastname}!",
+            colorama.Fore.WHITE,
+        )
+
+        if employee_type == "customer":
+            show_customer_employee_manager_menu()
+        else:
+            show_seller_employee_manager_menu()
+
+        choice = input("Please Choose:\n")
+
+        match choice:
+
+            case "1":
+                while True:
+                    if hire_employee(employee_type):
+                        break
+
+            case "2":
+                fire_employee(employee_type)
+
+            case "3":
+                give_employee_raise(employee_type)
+
+            case "4":
+                show_all_employees(employee_type)
+
+            case "5":
+                show_all_users(employee_type)
+
+            case "6":
+                generate_top5_report(employee_type)
+
+            case "7":
+                show_manager_account_info(manager)
+
+            case "8":
+                break
+
+            case _:
+                print(colorama.Fore.RED)
+                print("Please only choose from options")
 
 
 def main():
@@ -359,37 +393,37 @@ def main():
                     login, customer = Person.check_login(
                         "./Database/Customers.json", username, password
                     )
-                    if login: 
-                        customers_panel(customer)    
-                       
+                    if login:
+                        customers_panel(customer)
+
                 case "2":
                     login, seller = Person.check_login(
                         "./Database/Sellers.json", username, password
                     )
-                    if login: 
+                    if login:
                         sellers_panel(seller)
-                    
+
                 case "3":
                     login, customer_employee = Person.check_login(
                         "./Database/CustomerEmployees.json", username, password
                     )
-                    if login: 
+                    if login:
                         customer_employee_panel(customer_employee)
-                    
+
                 case "4":
                     login, seller_employee = Person.check_login(
                         "./Database/SellerEmployees.json", username, password
                     )
-                    if login: 
+                    if login:
                         seller_employee_panel(seller_employee)
-                    
+
                 case "5":
                     if (
                         username == customersManager.username
                         and customersManager.password
                         == Person.get_hash_Password(password)
                     ):
-                        customer_employee_manager_panel(customersManager)
+                        show_employee_manager_panel(customersManager, "customer")
                         login = True
                     else:
                         login = False
@@ -399,13 +433,13 @@ def main():
                         and sellersManager.password
                         == Person.get_hash_Password(password)
                     ):
-                        seller_employee_manager_panel(sellersManager)
+                        show_employee_manager_panel(sellersManager, "seller")
                         login = True
                     else:
                         login = False
             if not login:
                 print(colorama.Fore.RED)
-                print("Wrong username or password",colorama.Fore.WHITE) 
+                print("Wrong username or password", colorama.Fore.WHITE)
         elif choice == "7":
             print(colorama.Fore.RED, "\nBye!\n", colorama.Fore.WHITE)
             break

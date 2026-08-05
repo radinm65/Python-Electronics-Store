@@ -12,15 +12,15 @@ class SellerManager(Manager):
             firstname, lastname, username, password, age, phone_num, address
         )
 
-    def raise_salary(self, seller_employee_id, amount):
+    def raise_salary(seller_employee_id, amount):
         
         Validator.validate_raise_amount(amount)
         
-        seller_employees = self.get_seller_employees()
+        seller_employees = SellerManager.get_seller_employees()
         for se in seller_employees:
             if se["id"] == seller_employee_id:
                 se["salary"] += amount
-                return self.save_seller_employees(seller_employees)
+                return SellerManager.save_seller_employees(seller_employees)
         return False
 
     @staticmethod
@@ -72,3 +72,11 @@ class SellerManager(Manager):
     @staticmethod
     def save_seller_employees(seller_employees):
         return FileCommands.save_file_data("./Database/SellerEmployees.json", seller_employees)
+    
+    @staticmethod
+    def check_employee_byID(emp_id):
+        seller_employees = SellerManager.get_seller_employees()
+        for se in seller_employees:
+            if se["id"] == emp_id:
+                return True
+        return False

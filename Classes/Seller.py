@@ -7,26 +7,27 @@ from FileCommands import FileCommands
 
 class Seller(User):
     def __init__(
-        self, firstname, lastname, username, password, age, phone_num, address
+        self, firstname, lastname, username, password, age, phone_num, address, save
     ):
         super().__init__(
             firstname, lastname, username, password, age, phone_num, address
         )
         self.id = seller_id_generator.next_id()
         self.sold = []
-        new_seller = {
-            "id": self.id,
-            "firstname": self.firstname,
-            "lastname": self.lastname,
-            "username": self.username,
-            "password": self.password,
-            "age": self.age,
-            "phone_num": self.phone_num,
-            "address": self.address,
-            "balance": self.balance,
-            "sold": self.sold
-        }
-        FileCommands.add_data("./Database/UnapprovedSellers.json", new_seller)
+        if save:
+            new_seller = {
+                "id": self.id,
+                "firstname": self.firstname,
+                "lastname": self.lastname,
+                "username": self.username,
+                "password": self.password,
+                "age": self.age,
+                "phone_num": self.phone_num,
+                "address": self.address,
+                "balance": self.balance,
+                "sold": self.sold
+            }
+            FileCommands.add_data("./Database/UnapprovedSellers.json", new_seller)
         
         
     def make_product(self, name, brand, price, category):
@@ -41,4 +42,21 @@ class Seller(User):
         return seller_unapproved_products
     
     
-                
+    @classmethod
+    def from_dict(cls, data):
+        seller = cls(
+            data["firstname"],
+            data["lastname"],
+            data["username"],
+            data["password"],
+            data["age"],
+            data["phone_num"],
+            data["address"],
+            save=False
+        )
+
+        seller.id = data["id"]
+        seller.balance = data["balance"]
+        seller.sold = data["sold"]
+
+        return seller            

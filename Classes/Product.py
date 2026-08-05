@@ -5,7 +5,7 @@ from Validator import Validator
 
 
 class Product:
-    def __init__(self, name, brand, price, category, seller_id):
+    def __init__(self, name, brand, price, category, seller_id, save):
         self.id = product_id_generator.next_id()
         self.name = name
         self.brand = brand
@@ -13,16 +13,17 @@ class Product:
         self.category = category
         self.seller_id = seller_id
         self.__date_created = datetime.today()
-        new_product = {
-            "id": self.id,
-            "name": self.name,
-            "brand": self.brand,
-            "price": price,
-            "category": self.category,
-            "seller_id": self.seller_id,
-            "date_created": self.date_created.isoformat(),
-        }
-        FileCommands.add_data("./Database/UnapprovedProducts.json", new_product)
+        if save:
+            new_product = {
+                "id": self.id,
+                "name": self.name,
+                "brand": self.brand,
+                "price": price,
+                "category": self.category,
+                "seller_id": self.seller_id,
+                "date_created": self.date_created.isoformat(),
+            }
+            FileCommands.add_data("./Database/UnapprovedProducts.json", new_product)
 
     @property
     def name(self):
@@ -79,6 +80,19 @@ class Product:
             (product for product in products if product["id"] == product_id), None
         )
         return found_product
+    
+    @staticmethod
+    def from_dict(product_data):
+        product = Product(
+            product_data["name"],
+            product_data["brand"],
+            product_data["price"],
+            product_data["category"],
+            product_data["seller_id"],
+            save=False,
+            product_id=product_data["id"],
+            date_created=product_data["date_created"]
+        )
 
     def __str__(self):
         return (

@@ -6,7 +6,7 @@ from Classes.Product import Product
 
 class Customer(User):
     def __init__(
-        self, firstname, lastname, username, password, age, phone_num, address
+        self, firstname, lastname, username, password, age, phone_num, address, save
     ):
         super().__init__(
             firstname, lastname, username, password, age, phone_num, address
@@ -15,21 +15,22 @@ class Customer(User):
         self.cart = []
         self.favorites = []
         self.bought = []
-        new_customer = {
-            "id": self.id,
-            "firstname": self.firstname,
-            "lastname": self.lastname,
-            "username": self.username,
-            "password": self.password,
-            "age": self.age,
-            "phone_num": self.phone_num,
-            "address": self.address,
-            "balance": self.balance,
-            "cart": self.cart,
-            "favorites": self.favorites,
-            "bought": self.bought
-        }
-        FileCommands.add_data("./Database/Customers.json", new_customer)
+        if save:
+            new_customer = {
+                "id": self.id,
+                "firstname": self.firstname,
+                "lastname": self.lastname,
+                "username": self.username,
+                "password": self.password,
+                "age": self.age,
+                "phone_num": self.phone_num,
+                "address": self.address,
+                "balance": self.balance,
+                "cart": self.cart,
+                "favorites": self.favorites,
+                "bought": self.bought
+            }
+            FileCommands.add_data("./Database/Customers.json", new_customer)
 
 
     def add_to_cart(self, product_id):
@@ -118,6 +119,29 @@ class Customer(User):
                 return FileCommands.save_file_data("./Database/Customers.json", customers)
 
         return False
+    
+    @staticmethod
+    def from_dict(data):
+        customer = Customer(
+            data["firstname"],
+            data["lastname"],
+            data["username"],
+            data["password"],
+            data["age"],
+            data["phone_num"],
+            data["address"],
+            False
+        )
+
+        customer.id = data["id"]
+        customer.balance = data["balance"]
+        customer.cart = data["cart"]
+        customer.favorites = data["favorites"]
+        customer.bought = data["bought"]
+
+        return customer
+    
+    
     
     def __str__(self):
         return (

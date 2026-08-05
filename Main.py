@@ -283,6 +283,44 @@ def customer_employee_manager_panel(customersManager):
                 print("Please only choose from options", colorama.Fore.WHITE)
 
 
+
+
+def seller_employee_manager_panel(customersManager):
+    while True:
+        print(colorama.Fore.GREEN)
+        print(
+            f"Welcome Customer Manager {customersManager.firstname} {customersManager.lastname}!",
+            colorama.Fore.WHITE,
+        )
+        show_customer_employee_manager_menu()
+        choice = input("Please Choose:\n")
+
+        match choice:
+            case "1":
+                while True:
+                    if hire_customer_employee() == True:
+                        break
+            case "2":
+                fire_customer_employee()
+                pass
+            case "3":
+                give_raise_customer_employee()
+            case "4":
+                show_all_customer_employees()
+            case "5":
+                show_all_customers()
+            case "6":
+                generate_top5_customers_report()
+            case "7":
+                show_account_info(customersManager)
+            case "8":
+                break
+            case _:
+                print(colorama.Fore.RED)
+                print("Please only choose from options", colorama.Fore.WHITE)
+                
+                
+
 def seller_employee_manager_panel(sellersManager):
     pass
 
@@ -302,7 +340,7 @@ def main():
         "Janan",
         "Jafarnezhad",
         "janan123",
-        "Radinian@123",
+        "Jananian@123",
         "18",
         "9379499511",
         "Karaj_ mehrshahr",
@@ -321,38 +359,30 @@ def main():
                     login, customer = Person.check_login(
                         "./Database/Customers.json", username, password
                     )
-                    (
-                        customers_panel(customer)
-                        if login
-                        else print("Wrong username or password")
-                    )
+                    if login: 
+                        customers_panel(customer)    
+                       
                 case "2":
                     login, seller = Person.check_login(
                         "./Database/Sellers.json", username, password
                     )
-                    (
+                    if login: 
                         sellers_panel(seller)
-                        if login
-                        else print("Wrong username or password")
-                    )
+                    
                 case "3":
                     login, customer_employee = Person.check_login(
                         "./Database/CustomerEmployees.json", username, password
                     )
-                    (
+                    if login: 
                         customer_employee_panel(customer_employee)
-                        if login
-                        else print("Wrong username or password")
-                    )
+                    
                 case "4":
                     login, seller_employee = Person.check_login(
                         "./Database/SellerEmployees.json", username, password
                     )
-                    (
+                    if login: 
                         seller_employee_panel(seller_employee)
-                        if login
-                        else print("Wrong username or password")
-                    )
+                    
                 case "5":
                     if (
                         username == customersManager.username
@@ -360,8 +390,9 @@ def main():
                         == Person.get_hash_Password(password)
                     ):
                         customer_employee_manager_panel(customersManager)
+                        login = True
                     else:
-                        print("Wrong username or password")
+                        login = False
                 case "6":
                     if (
                         username == sellersManager.username
@@ -369,9 +400,12 @@ def main():
                         == Person.get_hash_Password(password)
                     ):
                         seller_employee_manager_panel(sellersManager)
+                        login = True
                     else:
-                        print(colorama.Fore.RED)
-                        print("Wrong username or password", colorama.Fore.WHITE)
+                        login = False
+            if not login:
+                print(colorama.Fore.RED)
+                print("Wrong username or password",colorama.Fore.WHITE) 
         elif choice == "7":
             print(colorama.Fore.RED, "\nBye!\n", colorama.Fore.WHITE)
             break

@@ -6,7 +6,7 @@ from Validator import Validator
 
 class Ticket:
 
-    def __init__(self, from_name, from_id, request, sender_type, response=""):
+    def __init__(self, from_name, from_id, request, sender_type, save, response=""):
         self.id = ticket_id_generator.next_id()
         self.from_name = from_name
         self.from_id = from_id
@@ -14,19 +14,20 @@ class Ticket:
         self.response = response
         self.sender_type = sender_type
         self.__date_created = datetime.today()
-        new_ticket = {
-            "id": self.id,
-            "from_name": self.from_name,
-            "from_id": self.from_id,
-            "request": self.request,
-            "response": self.response,
-            "sender_type": self.sender_type,
-            "date_created": self.date_created.isoformat(),
-        }
-        if new_ticket["sender_type"] == "customer":
-            FileCommands.add_data("./Database/CustomersTickets.json", new_ticket)
-        else:
-            FileCommands.add_data("./Database/SellersTickets.json", new_ticket)
+        if save:
+            new_ticket = {
+                "id": self.id,
+                "from_name": self.from_name,
+                "from_id": self.from_id,
+                "request": self.request,
+                "response": self.response,
+                "sender_type": self.sender_type,
+                "date_created": self.date_created.isoformat(),
+            }
+            if new_ticket["sender_type"] == "customer":
+                FileCommands.add_data("./Database/CustomersTickets.json", new_ticket)
+            else:
+                FileCommands.add_data("./Database/SellersTickets.json", new_ticket)
 
     @property
     def request(self):
@@ -90,3 +91,13 @@ class Ticket:
                 user_tickets.append(ticket)
         return user_tickets
 
+    @staticmethod
+    def from_dict(ticket_dict):
+        return Ticket(
+            from_name=ticket_dict["from_name"],
+            from_id=ticket_dict["from_id"],
+            request=ticket_dict["request"],
+            sender_type=ticket_dict["sender_type"],
+            save=False,
+            response=ticket_dict.get("response", "")
+        )

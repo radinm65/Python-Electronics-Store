@@ -1,0 +1,28 @@
+[
+    {
+        "id": 1,
+        "firstname": "radin",
+        "lastname": "motahhary",
+        "username": "radinm123",
+        "password": "3248fffb9b920086361bf40d80a2f3fd1039f1839a5dbc39160f06b09a968011",
+        "age": 22,
+        "phone_num": "9379499511",
+        "address": "karajjjjjj",
+        "bank_account_num": "6219861808079122",
+        "date_hired": "2026-08-05T19:15:14.319847",
+        "salary": 55000
+    },
+    {
+        "id": 2,
+        "firstname": "mohammad",
+        "lastname": "mohammadi",
+        "username": "mohamad@123",
+        "password": "bff71c25fc75e76c3f85ba36764032b64ce51236aef7a97828c624aa9e54ebd4",
+        "age": 33,
+        "phone_num": "9379379379",
+        "address": "tehrannnnnnnnnnnn",
+        "bank_account_num": "6219861808079122",
+        "date_hired": "2026-08-05T19:16:54.949292",
+        "salary": 32300
+    }
+]

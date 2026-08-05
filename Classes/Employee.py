@@ -1,4 +1,4 @@
-from Person import Person
+from Classes.Person import Person
 from abc import abstractmethod
 from datetime import datetime 
 from Validator import Validator

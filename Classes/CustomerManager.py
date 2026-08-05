@@ -1,6 +1,6 @@
-from Manager import Manager
+from Classes.Manager import Manager
 from FileCommands import FileCommands
-from CustomerEmployee import CustomerEmployee
+from Classes.CustomerEmployee import CustomerEmployee
 from Validator import Validator
 
 
@@ -12,15 +12,15 @@ class CustomerManager(Manager):
             firstname, lastname, username, password, age, phone_num, address
         )
 
-    def raise_salary(self, customers_employee_id, amount):
+    def raise_salary(customers_employee_id, amount):
         
         Validator.validate_raise_amount(amount)
         
-        customer_employees = self.get_customer_employees()
+        customer_employees = CustomerManager.get_customer_employees()
         for ce in customer_employees:
             if ce["id"] == customers_employee_id:
                 ce["salary"] += amount
-                return self.save_customer_employees(customer_employees)
+                return CustomerManager.save_customer_employees(customer_employees)
         return False
 
     @staticmethod
@@ -59,16 +59,24 @@ class CustomerManager(Manager):
             "date_hired": new_customer.date_hired.isoformat(),
             "salary": new_customer.salary
         }
-        return FileCommands.add_data("./CustomerEmployees.json", json_customer)
+        return FileCommands.add_data("./Database/CustomerEmployees.json", json_customer)
 
     @staticmethod
     def fire_employee(customers_employee_id):
-        return FileCommands.delete_data("./CustomerEmployees.json", customers_employee_id)
+        return FileCommands.delete_data("./Database/CustomerEmployees.json", customers_employee_id)
 
     @staticmethod
     def get_customer_employees():
-        return FileCommands.get_file_data("./CustomerEmployees.json")
+        return FileCommands.get_file_data("./Database/CustomerEmployees.json")
 
     @staticmethod
     def save_customer_employees(customer_employees):
-        return FileCommands.save_file_data("./CustomerEmployees.json", customer_employees)
+        return FileCommands.save_file_data("./Database/CustomerEmployees.json", customer_employees)
+    
+    @staticmethod
+    def check_employee_byID(emp_id):
+        customer_employees = CustomerManager.get_customer_employees()
+        for ce in customer_employees:
+            if ce["id"] == emp_id:
+                return True
+        return False

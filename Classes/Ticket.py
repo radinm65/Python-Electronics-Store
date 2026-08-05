@@ -24,9 +24,9 @@ class Ticket:
             "date_created": self.date_created.isoformat(),
         }
         if new_ticket["sender_type"] == "customer":
-            FileCommands.add_data("./CustomersTickets.json", new_ticket)
+            FileCommands.add_data("./Database/CustomersTickets.json", new_ticket)
         else:
-            FileCommands.add_data("./SellersTickets.json", new_ticket)
+            FileCommands.add_data("./Database/SellersTickets.json", new_ticket)
 
     @property
     def request(self):
@@ -71,11 +71,11 @@ class Ticket:
         
     @staticmethod    
     def get_customers_tickets():
-        return FileCommands.get_file_data("./CustomersTickets.json")
+        return FileCommands.get_file_data("./Database/CustomersTickets.json")
     
     @staticmethod    
     def get_sellers_tickets():
-        return FileCommands.get_file_data("./SellersTickets.json")
+        return FileCommands.get_file_data("./Database/SellersTickets.json")
     
     @staticmethod
     def get_user_tickets(user_id, sender_type):

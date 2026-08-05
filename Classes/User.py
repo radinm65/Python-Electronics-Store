@@ -1,5 +1,5 @@
-from Person import Person
-from Ticket import Ticket
+from Classes.Person import Person
+from Classes.Ticket import Ticket
 from Validator import Validator 
 
 class User(Person):

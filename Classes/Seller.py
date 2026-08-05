@@ -1,8 +1,8 @@
-from User import User
-from Product import Product
+from Classes.User import User
+from Classes.Product import Product
+from Classes.Ticket import Ticket
 from IDGenerator import seller_id_generator
 from FileCommands import FileCommands
-from Ticket import Ticket
 
 
 class Seller(User):
@@ -26,7 +26,7 @@ class Seller(User):
             "balance": self.balance,
             "sold": self.sold
         }
-        FileCommands.add_data("./UnapprovedSellers.json", new_seller)
+        FileCommands.add_data("./Database/UnapprovedSellers.json", new_seller)
         
         
     def make_product(self, name, brand, price, category):
@@ -34,7 +34,7 @@ class Seller(User):
             
     def get_seller_unapproved_products(self):
         seller_unapproved_products = []
-        unapproved_products = FileCommands.get_file_data("./UnapprovedProducts.json")
+        unapproved_products = FileCommands.get_file_data("./Database/UnapprovedProducts.json")
         for up in unapproved_products:
             if up["seller_id"] == self.id:
                 seller_unapproved_products.append(up)

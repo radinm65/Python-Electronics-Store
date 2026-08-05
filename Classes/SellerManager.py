@@ -1,6 +1,6 @@
-from Manager import Manager
+from Classes.Manager import Manager
+from Classes.SellerEmployee import SellerEmployee
 from FileCommands import FileCommands
-from SellerEmployee import SellerEmployee
 from Validator import Validator
 
 
@@ -59,16 +59,16 @@ class SellerManager(Manager):
             "date_hired": new_employee.date_hired.isoformat(),
             "salary": new_employee.salary
         }
-        return FileCommands.add_data("./SellerEmployees.json", json_employee)
+        return FileCommands.add_data("./Database/SellerEmployees.json", json_employee)
 
     @staticmethod
     def fire_employee(seller_employee_id):
-        return FileCommands.delete_data("./SellerEmployees.json", seller_employee_id)
+        return FileCommands.delete_data("./Database/SellerEmployees.json", seller_employee_id)
 
     @staticmethod
     def get_seller_employees():
-        return FileCommands.get_file_data("./SellerEmployees.json")
+        return FileCommands.get_file_data("./Database/SellerEmployees.json")
 
     @staticmethod
     def save_seller_employees(seller_employees):
-        return FileCommands.save_file_data("./SellerEmployees.json", seller_employees)
+        return FileCommands.save_file_data("./Database/SellerEmployees.json", seller_employees)

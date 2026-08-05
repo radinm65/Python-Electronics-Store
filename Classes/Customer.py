@@ -1,7 +1,7 @@
-from User import User
+from Classes.User import User
 from IDGenerator import customer_id_generator
 from FileCommands import FileCommands
-from Product import Product
+from Classes.Product import Product
 
 
 class Customer(User):
@@ -29,7 +29,7 @@ class Customer(User):
             "favorites": self.favorites,
             "bought": self.bought
         }
-        FileCommands.add_data("./Customers.json", new_customer)
+        FileCommands.add_data("./Database/Customers.json", new_customer)
 
 
     def add_to_cart(self, product_id):
@@ -47,7 +47,7 @@ class Customer(User):
                     raise ValueError("Already in cart.")
                 
                 customer["cart"].append(product_id)
-                return FileCommands.save_file_data("./Customers.json", customers)
+                return FileCommands.save_file_data("./Database/Customers.json", customers)
         return False
     
     def add_to_favorites(self, product_id):
@@ -65,7 +65,7 @@ class Customer(User):
                     raise ValueError("Already in favorites.")
                 
                 customer["favorites"].append(product_id)
-                return FileCommands.save_file_data("./Customers.json", customers)
+                return FileCommands.save_file_data("./Database/Customers.json", customers)
         return False
 
     def remove_from_favorites(self, product_id):
@@ -78,7 +78,7 @@ class Customer(User):
                     raise ValueError("Product is not in favorites.")
                 
                 customer["favorites"].remove(product_id)
-                return FileCommands.save_file_data("./Customers.json", customers)
+                return FileCommands.save_file_data("./Database/Customers.json", customers)
         return False
     
     
@@ -92,7 +92,7 @@ class Customer(User):
                     raise ValueError("Product is not in cart.")
                 
                 customer["cart"].remove(product_id)
-                return FileCommands.save_file_data("./Customers.json", customers)
+                return FileCommands.save_file_data("./Database/Customers.json", customers)
         return False
     
     def buy_product(self, product_id):
@@ -115,7 +115,7 @@ class Customer(User):
                 customer["bought"].append(product)
                 customer["cart"].remove(product_id)
 
-                return FileCommands.save_file_data("./Customers.json", customers)
+                return FileCommands.save_file_data("./Database/Customers.json", customers)
 
         return False
     

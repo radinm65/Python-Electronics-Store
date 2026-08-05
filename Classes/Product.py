@@ -22,7 +22,7 @@ class Product:
             "seller_id": self.seller_id,
             "date_created": self.date_created.isoformat(),
         }
-        FileCommands.add_data("./UnapprovedProducts.json", new_product)
+        FileCommands.add_data("./Database/UnapprovedProducts.json", new_product)
 
     @property
     def name(self):
@@ -66,11 +66,11 @@ class Product:
 
     @staticmethod
     def get_approved_products():
-        return FileCommands.get_file_data("./ApprovedProducts.json")
+        return FileCommands.get_file_data("./Database/ApprovedProducts.json")
 
     @staticmethod
     def save_approved_products(approvedProducts):
-        return FileCommands.save_file_data("./ApprovedProducts.json", approvedProducts)
+        return FileCommands.save_file_data("./Database/ApprovedProducts.json", approvedProducts)
 
     @staticmethod
     def get_product_byID(product_id):

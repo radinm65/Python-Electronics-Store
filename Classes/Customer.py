@@ -178,13 +178,14 @@ class Customer(User):
             data["firstname"],
             data["lastname"],
             data["username"],
-            data["password"],
-            data["age"],
+            "Temp123!45",
+            str(data["age"]),
             data["phone_num"],
             data["address"],
             False
         )
-
+        
+        customer.set_hashed_password(data["password"])
         customer.id = data["id"]
         customer.balance = data["balance"]
         customer.cart = data["cart"]

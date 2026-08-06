@@ -28,7 +28,31 @@ def show_main_menu():
 
 
 def show_customer_menu():
-    pass
+    print(colorama.Fore.YELLOW)
+    print(
+        "1- Shop\n" "2- Tickets\n" "2- Account Info\n" "4- Back\n",
+        colorama.Fore.WHITE,
+    )
+
+
+def show_customer_shop_menu():
+    print(colorama.Fore.YELLOW)
+    print(
+        "1- Buy Product\n"
+        "2- Add to Cart\n"
+        "3- Add To Favorites\n"
+        "4- See Cart and Favorites\n"
+        "5- Back\n",
+        colorama.Fore.WHITE,
+    )
+
+
+def show_customer_ticket_menu():
+    print(colorama.Fore.YELLOW)
+    print(
+        "1- See Submited tickets\n" "2- Submit Ticket\n" "3- Back\n",
+        colorama.Fore.WHITE,
+    )
 
 
 def show_seller_menu():
@@ -277,7 +301,7 @@ def show_all_users(employee_type):
     print(colorama.Fore.WHITE)
 
 
-def generate_top5_report(employee_type):
+def generate_top3_report(employee_type):
     successfull = False
     if employee_type == "customer":
         if len(CustomerEmployee.get_customers()) < 5:
@@ -320,11 +344,231 @@ def show_manager_account_info(manager):
     )
 
 
+def signup_login_user(username, password, usertype):
+    if usertype == "customer":
+        try:
+            login, customer = Person.check_login(
+                "./Database/Customers.json", username, password
+            )
+            if login:
+                customer_obj = Customer.from_dict(customer)
+                customers_panel(customer_obj)
+                return True
+            else:
+                print(colorama.Fore.RED)
+                print(
+                    "Wrong Username or Password.",
+                    colorama.Fore.WHITE,
+                )
+                while True:
+                    signup_choice = input("\nDo you have an Account?\n1- Yes\n2- No\n")
+                    if signup_choice == "1":
+                        return False
+                    elif signup_choice == "2":
+                        while True:
+
+                            signedup, signedup_customer = signup_user("customer")
+                            if signedup:
+                                customers_panel(signedup_customer)
+                                return True
+                    else:
+                        print(colorama.Fore.RED)
+                        print(
+                            "Please only choose from options!",
+                            colorama.Fore.WHITE,
+                        )
+        except ValueError as e:
+            print(colorama.Fore.RED)
+            print(
+                e,
+                colorama.Fore.WHITE,
+            )
+    elif usertype == "seller":
+        try:
+            login, seller = Person.check_login(
+                "./Database/Sellers.json", username, password
+            )
+            if login:
+                seller_obj = Seller.from_dict(seller)
+                customers_panel(seller_obj)
+                return True
+            else:
+                print(colorama.Fore.RED)
+                print(
+                    "Wrong Username or Password.",
+                    colorama.Fore.WHITE,
+                )
+                while True:
+                    signup_choice = input("\nDo you have an Account?\n1- Yes\n2- No\n")
+                    if signup_choice == "1":
+                        return False
+                    elif signup_choice == "2":
+                        while True:
+
+                            signedup, signedup_customer = signup_user("seller")
+                            if signedup:
+                                sellers_panel(signedup_customer)
+                                return True
+                    else:
+                        print(colorama.Fore.RED)
+                        print(
+                            "Please only choose from options!",
+                            colorama.Fore.WHITE,
+                        )
+        except ValueError as e:
+            print(colorama.Fore.RED)
+            print(
+                e,
+                colorama.Fore.WHITE,
+            )
+
+
+def signup_user(signup_type):
+    try:
+        print(colorama.Fore.RED)
+        print("Enter 'e' on first input to exit\n", colorama.Fore.WHITE)
+
+        firstname = input("Enter Firstname:\n")
+        if firstname == "e":
+            print(colorama.Fore.GREEN)
+            print("Exited signup!\n", colorama.Fore.WHITE)
+            return False, None
+
+        Validator.validate_firstname(firstname)
+
+        lastname = input("Enter Lastname:\n")
+        Validator.validate_lastname(lastname)
+
+        username = input("Enter Username:\n")
+        Validator.validate_username(username)
+
+        for customer in CustomerEmployee.get_customers():
+            if customer["username"] == username:
+                raise ValueError("Username already exists.")
+
+        password = input("Enter Password:\n")
+        Validator.validate_password(password)
+
+        age = input("Enter age:\n")
+        Validator.validate_age(age)
+
+        phone_num = input("Enter Phone number:\n")
+        Validator.validate_phone(phone_num)
+
+        address = input("Enter Address:\n")
+        Validator.validate_address(address)
+
+        if signup_type == "customer":
+            user = Customer(
+                firstname,
+                lastname,
+                username,
+                password,
+                age,
+                phone_num,
+                address,
+                save=True,
+            )
+            print(colorama.Fore.GREEN)
+            print("Customer Signed up Successfully!", colorama.Fore.WHITE)
+
+        elif signup_type == "seller":
+            user = Seller(
+                firstname,
+                lastname,
+                username,
+                password,
+                age,
+                phone_num,
+                address,
+                save=True,
+            )
+            print(colorama.Fore.GREEN)
+            print("Seller signed up Successfully!", colorama.Fore.WHITE)
+        return True, user
+
+    except ValueError as e:
+        print(colorama.Fore.RED)
+        print(e, colorama.Fore.WHITE)
+        return False, None
+
+
 # Panels -----------------------------------------------------------------
 
 
 def customers_panel(customer):
-    pass
+    while True:
+        print(colorama.Fore.GREEN)
+        print(
+            f"Welcome Customer {customer.firstname} {customer.lastname}!\n",
+            colorama.Fore.WHITE,
+        )
+
+        show_customer_menu()
+        choice = input("Please Choose:\n")
+
+        match choice:
+            case "1":
+                pass
+            case "2":
+                pass
+            case "3":
+                pass
+            case "4":
+                pass
+            case _:
+                print(colorama.Fore.RED)
+                print("Please only choose from options")
+
+
+def customers_Shop_panel(customer):
+    while True:
+        print(colorama.Fore.GREEN)
+        print(
+            f"Welcome Customer {customer.firstname} {customer.lastname}!\n",
+            colorama.Fore.WHITE,
+        )
+        show_customer_shop_menu()
+        choice = input("Please Choose:\n")
+
+        match choice:
+
+            case "1":
+                pass
+            case "2":
+                pass
+            case "3":
+                pass
+            case "4":
+                pass
+            case _:
+                print(colorama.Fore.RED)
+                print("Please only choose from options")
+
+
+def customers_Ticket_panel(customer):
+    while True:
+        print(colorama.Fore.GREEN)
+        print(
+            f"Welcome Customer {customer.firstname} {customer.lastname}!\n",
+            colorama.Fore.WHITE,
+        )
+        show_customer_ticket_menu()
+        choice = input("Please Choose:\n")
+
+        match choice:
+
+            case "1":
+                pass
+            case "2":
+                pass
+            case "3":
+                pass
+            case "4":
+                pass
+            case _:
+                print(colorama.Fore.RED)
+                print("Please only choose from options")
 
 
 def sellers_panel(seller):
@@ -344,7 +588,7 @@ def show_employee_manager_panel(manager, employee_type):
         print(colorama.Fore.GREEN)
         print(
             f"Welcome {employee_type.capitalize()} Manager {manager.firstname} {manager.lastname}!\n",
-            colorama.Fore.WHITE
+            colorama.Fore.WHITE,
         )
 
         if employee_type == "customer":
@@ -374,7 +618,7 @@ def show_employee_manager_panel(manager, employee_type):
                 show_all_users(employee_type)
 
             case "6":
-                generate_top5_report(employee_type)
+                generate_top3_report(employee_type)
 
             case "7":
                 show_manager_account_info(manager)
@@ -418,18 +662,12 @@ def main():
 
             match choice:
                 case "1":
-                    login, customer = Person.check_login(
-                        "./Database/Customers.json", username, password
-                    )
-                    customer_obj= Customer.from_dict(customer)
-                    if login:
-                        customers_panel(customer_obj)
-
+                    login = signup_login_customer(username, password)
                 case "2":
                     login, seller = Person.check_login(
                         "./Database/Sellers.json", username, password
                     )
-                    seller_obj= Seller.from_dict(seller)
+                    seller_obj = Seller.from_dict(seller)
                     if login:
                         sellers_panel(seller_obj)
 

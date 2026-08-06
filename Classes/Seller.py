@@ -48,13 +48,14 @@ class Seller(User):
             data["firstname"],
             data["lastname"],
             data["username"],
-            data["password"],
-            data["age"],
+            "Temp123!45",
+            str(data["age"]),
             data["phone_num"],
             data["address"],
             save=False
         )
 
+        seller.set_hashed_password(data["password"])
         seller.id = data["id"]
         seller.balance = data["balance"]
         seller.sold = data["sold"]

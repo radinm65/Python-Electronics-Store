@@ -54,6 +54,9 @@ class Person(ABC):
         Validator.validate_password(new_password)
 
         self.__password = hashlib.sha256(new_password.encode()).hexdigest()
+        
+    def set_hashed_password(self, hashed_password):
+        self.__password = hashed_password
 
     @property
     def age(self):

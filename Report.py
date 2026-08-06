@@ -1,94 +1,118 @@
+from Classes.Product import Product
 from FileCommands import FileCommands
+from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.chart import BarChart, Reference
+from openpyxl.chart.label import DataLabelList
+from openpyxl.drawing.text import ParagraphProperties, CharacterProperties
 
 
 class Report:
+
+    @staticmethod
+    def style_chart(chart, colors, categories_count):
+
+        # --- رنگ هر سری ---
+        for i, series in enumerate(chart.series):
+            if i < len(colors):
+                series.graphicalProperties.solidFill = colors[i]
+                series.graphicalProperties.line.noFill = True
+
+        # --- نمایش عدد بالای هر میله ---
+        chart.dataLabels = DataLabelList()
+        chart.dataLabels.showVal = True
+        chart.dataLabels.showLegendKey = False
+        chart.dataLabels.showCatName = False
+        chart.dataLabels.showSerName = False
+        chart.dataLabels.numFmt = "0"
+
+        # --- موقعیت Legend (بالای نمودار) ---
+        chart.legend.position = "t"
+        chart.legend.overlay = False
+
+        # --- حذف گرید‌لاین افقی (محور Y) ---
+        chart.y_axis.majorGridlines = None
+        chart.y_axis.delete = True
+
+        # --- تنظیم گپ بین میله‌ها ---
+        chart.gapWidth = 150
+        chart.overlap = -10
+
+        # --- سایز نمودار ---
+        chart.width = 22
+        chart.height = 12
+
+        # --- استایل عنوان ---
+        chart.title.tx.rich.p[0].pPr = ParagraphProperties(
+            defRPr=CharacterProperties(sz=1800, b=True, solidFill="595959")
+        )
+
+        return chart
 
     @staticmethod
     def generate_top_customers_report():
 
         customers = FileCommands.get_file_data("./Database/Customers.json")
 
-        report_data = []
+        monthly_totals = {}
+        customer_totals = {}
 
         for customer in customers:
-            total_spent = 0
-            items_bought = 0
+            name = customer["firstname"] + " " + customer["lastname"]
+            for purchase in customer["bought"]:
+                date = datetime.fromisoformat(purchase["date"])
+                month_key = date.strftime("%Y-%m")
+                month_label = date.strftime("%B").upper()
 
-            for product in customer["bought"]:
-                total_spent += product["price"]
-                items_bought += 1
+                product = Product.get_product_byID(purchase["product_id"])
+                if not product:
+                    continue
 
-            report_data.append({
-                "name": customer["firstname"] + " " + customer["lastname"],
-                "total_spent": total_spent,
-                "items_bought": items_bought
-            })
+                price = product["price"]
+                monthly_totals.setdefault(month_key, {"label": month_label, "data": {}})
+                monthly_totals[month_key]["data"][name] = (
+                    monthly_totals[month_key]["data"].get(name, 0) + price
+                )
+                customer_totals[name] = customer_totals.get(name, 0) + price
 
+        top_customers = sorted(customer_totals.items(), key=lambda x: x[1], reverse=True)[:3]
+        top_names = [name for name, _ in top_customers]
 
-        # مرتب سازی بر اساس پول خرج شده
-        report_data.sort(
-            key=lambda x: x["total_spent"],
-            reverse=True
-        )
-
-
-        top_5 = report_data[:5]
-
+        sorted_months = sorted(monthly_totals.keys())
 
         workbook = Workbook()
         sheet = workbook.active
         sheet.title = "Top Customers"
 
+        sheet.append(["Month"] + top_names)
 
-        sheet.append([
-            "Customer",
-            "Total Spent",
-            "Items Bought"
-        ])
+        for month_key in sorted_months:
+            month_label = monthly_totals[month_key]["label"]
+            row = [month_label]
+            for name in top_names:
+                row.append(monthly_totals[month_key]["data"].get(name, 0))
+            sheet.append(row)
 
-
-        for customer in top_5:
-            sheet.append([
-                customer["name"],
-                customer["total_spent"],
-                customer["items_bought"]
-            ])
-
-
-        # Bar Chart
         chart = BarChart()
-        chart.title = "Top 5 Customers By Spending"
-        chart.y_axis.title = "Money"
-        chart.x_axis.title = "Customer"
+        chart.type = "col"
+        chart.grouping = "clustered"
+        chart.title = "TOP 3 CUSTOMERS MONTHLY PURCHASE"
+        chart.x_axis.title = "MONTH"
 
+        n_rows = len(sorted_months)
 
-        data = Reference(
-            sheet,
-            min_col=2,
-            min_row=1,
-            max_row=len(top_5)+1
-        )
-
-        categories = Reference(
-            sheet,
-            min_col=1,
-            min_row=2,
-            max_row=len(top_5)+1
-        )
-
+        data = Reference(sheet, min_col=2, max_col=1 + len(top_names), min_row=1, max_row=n_rows + 1)
+        categories = Reference(sheet, min_col=1, min_row=2, max_row=n_rows + 1)
 
         chart.add_data(data, titles_from_data=True)
         chart.set_categories(categories)
 
-        sheet.add_chart(chart, "E2")
+        Report.style_chart(chart, ["4472C4", "C0504D", "9BBB59"], n_rows)
 
-
-        workbook.save("./Reports/Top_Customers_Report.xlsx")
+        sheet.add_chart(chart, "F2")
+        workbook.save("./Reports/Top_Customers_Monthly_Report.xlsx")
 
         return True
-
 
 
     @staticmethod
@@ -96,90 +120,68 @@ class Report:
 
         sellers = FileCommands.get_file_data("./Database/Sellers.json")
 
-        report_data = []
-
+        monthly_totals = {}   # month_key -> {"label": month_label, "data": {seller_name: total}}
+        seller_totals = {}    # seller_name -> total فروش کل (برای تشخیص ۳ نفر برتر)
 
         for seller in sellers:
+            name = seller["firstname"] + " " + seller["lastname"]
 
-            total_sales = 0
-            items_sold = 0
+            for sale in seller["sold"]:
+                date = datetime.fromisoformat(sale["date"])
+                month_key = date.strftime("%Y-%m")
+                month_label = date.strftime("%B").upper()
 
+                product = Product.get_product_byID(sale["product_id"])
+                if not product:
+                    continue
 
-            for product in seller["sold"]:
-                total_sales += product["price"]
-                items_sold += 1
+                price = product["price"]
 
+                monthly_totals.setdefault(month_key, {"label": month_label, "data": {}})
+                monthly_totals[month_key]["data"][name] = (
+                    monthly_totals[month_key]["data"].get(name, 0) + price
+                )
 
-            report_data.append({
+                seller_totals[name] = seller_totals.get(name, 0) + price
 
-                "name": seller["firstname"] + " " + seller["lastname"],
-                "total_sales": total_sales,
-                "items_sold": items_sold
+        # پیدا کردن ۳ فروشنده برتر (بر اساس مجموع کل فروش)
+        top_sellers = sorted(seller_totals.items(), key=lambda x: x[1], reverse=True)[:3]
+        top_names = [name for name, _ in top_sellers]
 
-            })
-
-
-        report_data.sort(
-            key=lambda x: x["total_sales"],
-            reverse=True
-        )
-
-
-        top_5 = report_data[:5]
-
+        # مرتب سازی ماه ها به ترتیب زمانی
+        sorted_months = sorted(monthly_totals.keys())
 
         workbook = Workbook()
         sheet = workbook.active
         sheet.title = "Top Sellers"
 
+        sheet.append(["Month"] + top_names)
 
-        sheet.append([
-            "Seller",
-            "Total Sales",
-            "Items Sold"
-        ])
+        for month_key in sorted_months:
+            month_label = monthly_totals[month_key]["label"]
+            row = [month_label]
+            for name in top_names:
+                row.append(monthly_totals[month_key]["data"].get(name, 0))
+            sheet.append(row)
 
-
-        for seller in top_5:
-            sheet.append([
-                seller["name"],
-                seller["total_sales"],
-                seller["items_sold"]
-            ])
-
-
-
-        # Bar Chart
         chart = BarChart()
+        chart.type = "col"
+        chart.grouping = "clustered"
+        chart.title = "TOP 3 SELLERS MONTHLY SALES"
+        chart.x_axis.title = "MONTH"
 
-        chart.title = "Top 5 Sellers By Revenue"
-        chart.y_axis.title = "Revenue"
-        chart.x_axis.title = "Seller"
+        n_rows = len(sorted_months)
 
-
-        data = Reference(
-            sheet,
-            min_col=2,
-            min_row=1,
-            max_row=len(top_5)+1
-        )
-
-
-        categories = Reference(
-            sheet,
-            min_col=1,
-            min_row=2,
-            max_row=len(top_5)+1
-        )
-
+        data = Reference(sheet, min_col=2, max_col=1 + len(top_names), min_row=1, max_row=n_rows + 1)
+        categories = Reference(sheet, min_col=1, min_row=2, max_row=n_rows + 1)
 
         chart.add_data(data, titles_from_data=True)
         chart.set_categories(categories)
 
+        Report.style_chart(chart, ["4472C4", "C0504D", "9BBB59"], n_rows)
 
         sheet.add_chart(chart, "E2")
 
-
-        workbook.save("./Reports/Top_Sellers_Report.xlsx")
+        workbook.save("./Reports/Top_Sellers_Monthly_Report.xlsx")
 
         return True

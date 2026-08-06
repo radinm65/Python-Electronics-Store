@@ -9,7 +9,16 @@
     "phone_num": "0912345678",
     "address": "Tehran Valiasr Street",
     "balance": 15000,
-    "sold": []
+    "sold": [
+      {
+        "product_id": 1,
+        "date": "2026-08-02T10:30:00"
+      },
+      {
+        "product_id": 3,
+        "date": "2026-09-05T15:20:00"
+      }
+    ]
   },
   {
     "id": 2,
@@ -21,7 +30,16 @@
     "phone_num": "0923456789",
     "address": "Shiraz Eram Boulevard",
     "balance": 23000,
-    "sold": []
+    "sold": [
+      {
+        "product_id": 2,
+        "date": "2026-08-10T12:00:00"
+      },
+      {
+        "product_id": 5,
+        "date": "2026-09-12T18:45:00"
+      }
+    ]
   },
   {
     "id": 3,
@@ -33,7 +51,20 @@
     "phone_num": "0934567890",
     "address": "Mashhad Ferdowsi Avenue",
     "balance": 32000,
-    "sold": []
+    "sold": [
+      {
+        "product_id": 4,
+        "date": "2026-08-15T09:15:00"
+      },
+      {
+        "product_id": 1,
+        "date": "2026-09-20T11:30:00"
+      },
+      {
+        "product_id": 2,
+        "date": "2026-09-25T16:00:00"
+      }
+    ]
   },
   {
     "id": 4,
@@ -45,7 +76,12 @@
     "phone_num": "0945678901",
     "address": "Tabriz Azadi Square",
     "balance": 18000,
-    "sold": []
+    "sold": [
+      {
+        "product_id": 5,
+        "date": "2026-08-20T14:10:00"
+      }
+    ]
   },
   {
     "id": 5,
@@ -57,6 +93,15 @@
     "phone_num": "0956789012",
     "address": "Isfahan Chaharbagh Street",
     "balance": 27000,
-    "sold": []
+    "sold": [
+      {
+        "product_id": 3,
+        "date": "2026-08-25T17:40:00"
+      },
+      {
+        "product_id": 4,
+        "date": "2026-09-28T13:00:00"
+      }
+    ]
   }
 ]

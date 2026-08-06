@@ -154,7 +154,7 @@ def hire_employee(employee_type):
 
 def fire_employee(employee_type):
     try:
-        emp_id = input(f"\nEnter {employee_type} Employee ID to Fire:\n")
+        emp_id = int(input(f"\nEnter {employee_type} Employee ID to Fire:\n"))
         if employee_type == "customer":
             if CustomerManager.fire_employee(emp_id):
                 print(colorama.Fore.GREEN)
@@ -171,9 +171,8 @@ def fire_employee(employee_type):
 def give_employee_raise(employee_type):
     try:
         success = False
-        emp_id = input("\nEnter Customer Employee ID to Give Raise:\n")
+        emp_id = int(input("\nEnter Customer Employee ID to Give Raise:\n"))
         if employee_type == "customer":
-
             if CustomerManager.check_employee_byID(emp_id):
                 salary_raise = int(input("How much raise?\n"))
                 CustomerManager.raise_salary(emp_id, salary_raise)
@@ -234,12 +233,21 @@ def show_all_employees(employee_type):
 def show_all_users(employee_type):
     if employee_type == "customer":
         users = CustomerEmployee.get_customers()
+
     elif employee_type == "seller":
         users = SellerEmployee.get_sellers()
-        if len(users) == 0:
-            print(colorama.Fore.RED)
-            print(f"No {employee_type}s have been registered.")
-            return
+
+    else:
+        print(colorama.Fore.RED)
+        print("Invalid user type.")
+        print(colorama.Fore.WHITE)
+        return
+
+    if len(users) == 0:
+        print(colorama.Fore.RED)
+        print(f"No {employee_type}s have been registered.", colorama.Fore.WHITE)
+        return
+
     for user in users:
         print(colorama.Fore.BLUE)
         print(
@@ -251,21 +259,34 @@ def show_all_users(employee_type):
             f"Age: {user['age']}\n"
             f"Phone_num: {user['phone_num']}\n"
             f"Address: {user['address']}\n"
-            f"Bank account Number: {user['bank_account_num']}\n"
-            f"Date Hired: {user['date_hired']}\n"
-            f"Salary: {user['salary']}\n"
+            f"Balance: {user['balance']}\n"
         )
+
+        if employee_type == "customer":
+            print(
+                f"Cart: {user['cart']}\n"
+                f"Favorites: {user['favorites']}\n"
+                f"Bought: {user['bought']}\n"
+            )
+
+        elif employee_type == "seller":
+            print(f"Sold: {user['sold']}\n")
+
+        print()
+
     print(colorama.Fore.WHITE)
 
 
 def generate_top5_report(employee_type):
+    successfull = False
     if employee_type == "customer":
         if len(CustomerEmployee.get_customers()) < 5:
             print(colorama.Fore.RED)
             print("Not enough data for report to generate.", colorama.Fore.WHITE)
         else:
             try:
-                Report.generate_top_customers_report()
+                if Report.generate_top_customers_report():
+                    successfull = True
             except Exception as e:
                 print(colorama.Fore.RED)
                 print(e, colorama.Fore.WHITE)
@@ -275,10 +296,15 @@ def generate_top5_report(employee_type):
             print("Not enough data for report to generate.", colorama.Fore.WHITE)
         else:
             try:
-                Report.generate_top_sellers_report()
+                if Report.generate_top_sellers_report():
+                    successfull = True
             except Exception as e:
                 print(colorama.Fore.RED)
                 print(e, colorama.Fore.WHITE)
+
+    if successfull:
+        print(colorama.Fore.GREEN)
+        print("Generated Succesfully", colorama.Fore.WHITE)
 
 
 def show_manager_account_info(manager):
@@ -317,9 +343,8 @@ def show_employee_manager_panel(manager, employee_type):
     while True:
         print(colorama.Fore.GREEN)
         print(
-            f"Welcome {employee_type.capitalize()} Manager "
-            f"{manager.firstname} {manager.lastname}!",
-            colorama.Fore.WHITE,
+            f"Welcome {employee_type.capitalize()} Manager {manager.firstname} {manager.lastname}!\n",
+            colorama.Fore.WHITE
         )
 
         if employee_type == "customer":
@@ -374,11 +399,11 @@ def main():
         "Karaj_ mehrshahr",
     )
     sellersManager = SellerManager(
-        "Janan",
-        "Jafarnezhad",
-        "janan123",
-        "Jananian@123",
-        "18",
+        "Radin",
+        "Motahhary",
+        "radinm123",
+        "Radinian@123",
+        "21",
         "9379499511",
         "Karaj_ mehrshahr",
     )
@@ -396,15 +421,17 @@ def main():
                     login, customer = Person.check_login(
                         "./Database/Customers.json", username, password
                     )
+                    customer_obj= Customer.from_dict(customer)
                     if login:
-                        customers_panel(customer)
+                        customers_panel(customer_obj)
 
                 case "2":
                     login, seller = Person.check_login(
                         "./Database/Sellers.json", username, password
                     )
+                    seller_obj= Seller.from_dict(seller)
                     if login:
-                        sellers_panel(seller)
+                        sellers_panel(seller_obj)
 
                 case "3":
                     login, customer_employee = Person.check_login(

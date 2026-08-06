@@ -1,7 +1,8 @@
 from Classes.User import User
+from Classes.Product import Product
 from IDGenerator import customer_id_generator
 from FileCommands import FileCommands
-from Classes.Product import Product
+from datetime import datetime
 
 
 class Customer(User):
@@ -98,12 +99,14 @@ class Customer(User):
     
     def buy_product(self, product_id):
         product = Product.get_product_byID(product_id)
+
         if product is None:
             raise ValueError("Product not found.")
-        
+
         customers = self.get_customers()
 
         for customer in customers:
+
             if customer["id"] == self.id:
 
                 if product["price"] > customer["balance"]:
@@ -112,11 +115,60 @@ class Customer(User):
                 if product_id not in customer["cart"]:
                     raise ValueError("Product is not in cart.")
 
+
+                purchase_date = datetime.today().isoformat()
+
+
                 customer["balance"] -= product["price"]
-                customer["bought"].append(product)
+
+
+                customer["bought"].append(
+                    {
+                        "product_id": product_id,
+                        "date": purchase_date
+                    }
+                )
+
+
                 customer["cart"].remove(product_id)
 
-                return FileCommands.save_file_data("./Database/Customers.json", customers)
+
+
+
+                sellers = FileCommands.get_file_data(
+                    "./Database/Sellers.json"
+                )
+
+
+                for seller in sellers:
+
+                    if seller["id"] == product["seller_id"]:
+
+                        seller["balance"] += product["price"]
+
+
+                        seller["sold"].append(
+                            {
+                                "product_id": product_id,
+                                "date": purchase_date
+                            }
+                        )
+
+                        break
+
+
+
+                FileCommands.save_file_data(
+                    "./Database/Sellers.json",
+                    sellers
+                )
+
+
+                return FileCommands.save_file_data(
+                    "./Database/Customers.json",
+                    customers
+                )
+
 
         return False
     

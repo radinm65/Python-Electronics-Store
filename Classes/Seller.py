@@ -13,6 +13,7 @@ class Seller(User):
             firstname, lastname, username, password, age, phone_num, address
         )
         self.id = seller_id_generator.next_id()
+        self.selling_products = []
         self.sold = []
         if save:
             new_seller = {
@@ -25,6 +26,7 @@ class Seller(User):
                 "phone_num": self.phone_num,
                 "address": self.address,
                 "balance": self.balance,
+                "selling_products": self.selling_products,
                 "sold": self.sold
             }
             FileCommands.add_data("./Database/UnapprovedSellers.json", new_seller)
@@ -58,6 +60,7 @@ class Seller(User):
         seller.set_hashed_password(data["password"])
         seller.id = data["id"]
         seller.balance = data["balance"]
+        seller.selling_products = data["selling_products"]
         seller.sold = data["sold"]
 
         return seller            

@@ -1,5 +1,6 @@
 from Classes.User import User
 from Classes.Product import Product
+from Classes.CustomerEmployee import CustomerEmployee
 from IDGenerator import customer_id_generator
 from FileCommands import FileCommands
 from datetime import datetime
@@ -29,149 +30,160 @@ class Customer(User):
                 "balance": self.balance,
                 "cart": self.cart,
                 "favorites": self.favorites,
-                "bought": self.bought
+                "bought": self.bought,
             }
             FileCommands.add_data("./Database/Customers.json", new_customer)
 
 
+    @staticmethod
+    def get_customers():
+        return FileCommands.get_file_data("./Database/Customers.json")
+
+
     def add_to_cart(self, product_id):
         product = Product.get_product_byID(product_id)
-        
+
         if product is None:
             raise ValueError("Product not found.")
-        
-        customers = self.get_customers()
-        
+
+        customers = Customer.get_customers()
+
         for customer in customers:
             if customer["id"] == self.id:
-                
+
                 if product_id in customer["cart"]:
                     raise ValueError("Already in cart.")
-                
+
                 customer["cart"].append(product_id)
-                return FileCommands.save_file_data("./Database/Customers.json", customers)
+                return FileCommands.save_file_data(
+                    "./Database/Customers.json", customers
+                )
         return False
-    
+
     def add_to_favorites(self, product_id):
-        
+
         product = Product.get_product_byID(product_id)
-        
+
         if product is None:
             raise ValueError("Product not found.")
-        
-        customers = self.get_customers()
+
+        customers = Customer.get_customers()
         for customer in customers:
             if customer["id"] == self.id:
-                
+
                 if product_id in customer["favorites"]:
                     raise ValueError("Already in favorites.")
-                
+
                 customer["favorites"].append(product_id)
-                return FileCommands.save_file_data("./Database/Customers.json", customers)
+                return FileCommands.save_file_data(
+                    "./Database/Customers.json", customers
+                )
         return False
 
     def remove_from_favorites(self, product_id):
-        customers = self.get_customers()
-        
+        customers = Customer.get_customers()
+
         for customer in customers:
             if customer["id"] == self.id:
-                
+
                 if product_id not in customer["favorites"]:
                     raise ValueError("Product is not in favorites.")
-                
+
                 customer["favorites"].remove(product_id)
-                return FileCommands.save_file_data("./Database/Customers.json", customers)
+                return FileCommands.save_file_data(
+                    "./Database/Customers.json", customers
+                )
         return False
-    
-    
+
     def remove_from_cart(self, product_id):
-        customers = self.get_customers()
-        
+        customers = Customer.get_customers()
+
         for customer in customers:
             if customer["id"] == self.id:
-                
+
                 if product_id not in customer["cart"]:
                     raise ValueError("Product is not in cart.")
-                
+
                 customer["cart"].remove(product_id)
-                return FileCommands.save_file_data("./Database/Customers.json", customers)
+                return FileCommands.save_file_data(
+                    "./Database/Customers.json", customers
+                )
+        return False
+
+    def checkout(self):
+        customers = Customer.get_customers()
+        for customer in customers:
+            if customer["id"] == self.id:
+                if len(customer["cart"]) == 0:
+                    raise ValueError("Cart is empty.")
+                sellers = FileCommands.get_file_data("./Database/Sellers.json")
+                purchase_date = datetime.today().isoformat()
+                total_price = 0
+                # اول چک موجودی
+                for product_id in customer["cart"]:
+                    product = Product.get_product_byID(product_id)
+                    if product is None:
+                        raise ValueError("Product not found.")
+                    total_price += product["price"]
+                if total_price > customer["balance"]:
+                    raise ValueError("Not enough balance.")
+                # خرید انجام شود
+                for product_id in customer["cart"]:
+                    product = Product.get_product_byID(product_id)
+                    customer["bought"].append(
+                        {"product_id": product_id, "date": purchase_date}
+                    )
+                    # پیدا کردن فروشنده
+                    for seller in sellers:
+                        if seller["id"] == product["seller_id"]:
+                            seller["balance"] += product["price"]
+                            seller["sold"].append(
+                                {"product_id": product_id, "date": purchase_date}
+                            )
+                            break
+                customer["balance"] -= total_price
+                # خالی کردن سبد
+                customer["cart"].clear()
+                FileCommands.save_file_data("./Database/Sellers.json", sellers)
+                return FileCommands.save_file_data(
+                    "./Database/Customers.json", customers
+                )
         return False
     
-    def buy_product(self, product_id):
-        product = Product.get_product_byID(product_id)
+    @staticmethod
+    def get_customer_byID(customer_id):
+        customers = Customer.get_customers()
+        found_customer = next(
+            (customer for customer in customers if customer["id"] == customer_id), None
+        )
+        return found_customer
+    
+    @staticmethod
+    def add_cart_to_favorites(customer_id):
 
-        if product is None:
-            raise ValueError("Product not found.")
-
-        customers = self.get_customers()
+        customers = Customer.get_customers()
 
         for customer in customers:
 
-            if customer["id"] == self.id:
+            if customer["id"] == customer_id:
 
-                if product["price"] > customer["balance"]:
-                    raise ValueError("Product Price is More than balance.")
+                if len(customer["favorites"]) == 0:
+                    raise ValueError("Favorites is empty.")
 
-                if product_id not in customer["cart"]:
-                    raise ValueError("Product is not in cart.")
-
-
-                purchase_date = datetime.today().isoformat()
-
-
-                customer["balance"] -= product["price"]
-
-
-                customer["bought"].append(
-                    {
-                        "product_id": product_id,
-                        "date": purchase_date
-                    }
-                )
-
-
-                customer["cart"].remove(product_id)
-
-
-
-
-                sellers = FileCommands.get_file_data(
-                    "./Database/Sellers.json"
-                )
-
-
-                for seller in sellers:
-
-                    if seller["id"] == product["seller_id"]:
-
-                        seller["balance"] += product["price"]
-
-
-                        seller["sold"].append(
-                            {
-                                "product_id": product_id,
-                                "date": purchase_date
-                            }
-                        )
-
-                        break
-
-
-
-                FileCommands.save_file_data(
-                    "./Database/Sellers.json",
-                    sellers
-                )
-
+                for product_id in customer["favorites"]:
+                    
+                    if product_id not in customer["cart"]:
+                        customer["cart"].append(product_id)
+                    
+                customer["favorites"] = []
 
                 return FileCommands.save_file_data(
                     "./Database/Customers.json",
                     customers
                 )
 
-
         return False
-    
+
     @staticmethod
     def from_dict(data):
         customer = Customer(
@@ -182,9 +194,9 @@ class Customer(User):
             str(data["age"]),
             data["phone_num"],
             data["address"],
-            False
+            False,
         )
-        
+
         customer.set_hashed_password(data["password"])
         customer.id = data["id"]
         customer.balance = data["balance"]
@@ -193,18 +205,18 @@ class Customer(User):
         customer.bought = data["bought"]
 
         return customer
-    
-    
-    
+
     def __str__(self):
         return (
             f"ID: {self.id}\n"
-            f"firstname: {self.firstname}\n"
-            f"lastname: {self.lastname}\n"
-            f"username: {self.username}\n"
-            f"age: {self.age}\n"
-            f"phone_num: {self.phone_num}\n"
-            f"address: {self.address}\n"
+            f"Firstname: {self.firstname}\n"
+            f"Lastname: {self.lastname}\n"
+            f"Username: {self.username}\n"
+            f"Age: {self.age}\n"
+            f"Phone_num: {self.phone_num}\n"
+            f"Address: {self.address}\n"
+            f"Balance: {self.balance}\n"
+            f"Cart: {self.cart}\n"
+            f"Favorites: {self.favorites}\n"
+            f"Bought: {self.bought}\n"
         )
-        
-    

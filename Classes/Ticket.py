@@ -93,7 +93,7 @@ class Ticket:
 
     @staticmethod
     def from_dict(ticket_dict):
-        return Ticket(
+        ticket =  Ticket(
             from_name=ticket_dict["from_name"],
             from_id=ticket_dict["from_id"],
             request=ticket_dict["request"],
@@ -101,3 +101,6 @@ class Ticket:
             save=False,
             response=ticket_dict.get("response", "")
         )
+        ticket.id = ticket_dict["id"]
+        
+        return ticket

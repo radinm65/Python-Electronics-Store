@@ -134,9 +134,32 @@
         "age": 18,
         "phone_num": "9379499511",
         "address": "karaj_golha",
-        "balance": 0,
-        "cart": [],
+        "balance": 59000,
+        "cart": [
+            3,
+            1,
+            4,
+            2,
+            5
+        ],
         "favorites": [],
-        "bought": []
+        "bought": [
+            {
+                "product_id": 4,
+                "date": "2026-05-25T19:00:00"
+            },
+            {
+                "product_id": 5,
+                "date": "2026-07-02T10:30:00"
+            },
+            {
+                "product_id": 2,
+                "date": "2026-08-05T09:45:00"
+            },
+            {
+                "product_id": 5,
+                "date": "2026-08-06T14:30:41.276807"
+            }
+        ]
     }
 ]

@@ -89,10 +89,11 @@ class Product:
             product_data["price"],
             product_data["category"],
             product_data["seller_id"],
-            save=False,
-            product_id=product_data["id"],
-            date_created=product_data["date_created"]
+            save=False
         )
+        product.id = product_data["id"]
+        
+        return product
 
     def __str__(self):
         return (

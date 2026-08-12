@@ -29,10 +29,6 @@ class CustomerEmployee(Employee):
         self.id = customer_employee_id_generator.next_id()
 
     @staticmethod
-    def get_customers():
-        return FileCommands.get_file_data("./Database/Customers.json")
-
-    @staticmethod
     def save_customers(datas):
         return FileCommands.save_file_data("./Database/Customers.json", datas)
 

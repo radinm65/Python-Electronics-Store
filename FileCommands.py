@@ -1,37 +1,30 @@
 import os
 import json
 
+
 class FileCommands:
-    
+
     @staticmethod
     def get_file_data(path):
-        try:
-            if not os.path.exists(path):
-                with open(path, "w") as file:
-                    json.dump([], file)
-            with open(path, "r") as file:
-                data = json.load(file)
-            return data
-        except Exception as e:
-            print(e)
-            return []
-
+        if not os.path.exists(path):
+            with open(path, "w") as file:
+                json.dump([], file)
+        with open(path, "r") as file:
+            data = json.load(file)
+        return data
 
     @staticmethod
     def save_file_data(path, datas):
-        with open(path, 'w') as file:
+        with open(path, "w") as file:
             json.dump(datas, file, indent=4)
             return True
-        
-            
-            
+
     @staticmethod
     def add_data(path, new_data):
         all_datas = FileCommands.get_file_data(path)
         all_datas.append(new_data)
         return FileCommands.save_file_data(path, all_datas)
 
-        
     @staticmethod
     def delete_data(path, data_id):
 

@@ -6,8 +6,20 @@ from Classes.Customer import Customer
 from Classes.Seller import Seller
 from Classes.CustomerEmployee import CustomerEmployee
 from Classes.SellerEmployee import SellerEmployee
+from Classes.Product import Product
 from Report import Report
 from Validator import Validator
+
+
+def print_error(message):
+    print(colorama.Fore.RED)
+    print(message, colorama.Fore.WHITE)
+
+
+def print_successful(message):
+    print(colorama.Fore.GREEN)
+    print(message, colorama.Fore.WHITE)
+
 
 # Show Menus -------------------
 
@@ -30,24 +42,26 @@ def show_main_menu():
 def show_customer_menu():
     print(colorama.Fore.YELLOW)
     print(
-        "1- Shop\n" "2- Tickets\n" "2- Account Info\n" "4- Back\n",
-        colorama.Fore.WHITE,
+        "1- Shop\n" "2- Tickets\n" "3- Account Info\n" "4- Back\n", colorama.Fore.WHITE
     )
 
 
 def show_customer_shop_menu():
     print(colorama.Fore.YELLOW)
     print(
-        "1- Buy Product\n"
+        "1- Checkout\n"
         "2- Add to Cart\n"
         "3- Add To Favorites\n"
-        "4- See Cart and Favorites\n"
-        "5- Back\n",
+        "4- Add Favorites To cart\n"
+        "5- Delete From Cart\n"
+        "6- Delete From Favorites\n"
+        "7- See Cart and Favorites\n"
+        "8- Back\n",
         colorama.Fore.WHITE,
     )
 
 
-def show_customer_ticket_menu():
+def show_ticket_menu():
     print(colorama.Fore.YELLOW)
     print(
         "1- See Submited tickets\n" "2- Submit Ticket\n" "3- Back\n",
@@ -56,7 +70,22 @@ def show_customer_ticket_menu():
 
 
 def show_seller_menu():
-    pass
+    print(colorama.Fore.YELLOW)
+    print(
+        "1- Products Menu\n" "2- Tickets Menu\n" "3- Account Info\n" "4- Back\n",
+        colorama.Fore.WHITE,
+    )
+
+
+def show_seller_product_menu():
+    print(colorama.Fore.YELLOW)
+    print(
+        "1- Make Product\n"
+        "2- See Unapproved Products\n"
+        "3- See Selling Products\n"
+        "4- Back\n",
+        colorama.Fore.WHITE,
+    )
 
 
 def show_customer_employee_menu():
@@ -104,13 +133,11 @@ def show_seller_employee_manager_menu():
 
 def hire_employee(employee_type):
     try:
-        print(colorama.Fore.RED)
-        print("Enter 'e' on first input to exit\n", colorama.Fore.WHITE)
+        print_error("Enter 'e' on first input to exit\n")
 
         firstname = input("Enter Firstname:\n")
         if firstname == "e":
-            print(colorama.Fore.GREEN)
-            print("Exited Hiring!\n", colorama.Fore.WHITE)
+            print_successful("Exited Hiring!\n")
             return True
 
         Validator.validate_firstname(firstname)
@@ -151,8 +178,7 @@ def hire_employee(employee_type):
                 bank_account_num,
                 salary,
             )
-            print(colorama.Fore.GREEN)
-            print("Customer Employee has Been Hired Successfully!", colorama.Fore.WHITE)
+            print_successful("Customer Employee has Been Hired Successfully!")
 
         elif employee_type == "seller":
             SellerManager.hire_employee(
@@ -166,13 +192,11 @@ def hire_employee(employee_type):
                 bank_account_num,
                 salary,
             )
-            print(colorama.Fore.GREEN)
-            print("Seller Employee has Been Hired Successfully!", colorama.Fore.WHITE)
+            print_successful("Seller Employee has Been Hired Successfully!")
         return True
 
     except ValueError as e:
-        print(colorama.Fore.RED)
-        print(e, colorama.Fore.WHITE)
+        print_error(e)
         return False
 
 
@@ -181,15 +205,12 @@ def fire_employee(employee_type):
         emp_id = int(input(f"\nEnter {employee_type} Employee ID to Fire:\n"))
         if employee_type == "customer":
             if CustomerManager.fire_employee(emp_id):
-                print(colorama.Fore.GREEN)
-                print("Customer Employee is Fired!")
+                print_successful("Customer Employee is Fired!")
         elif employee_type == "seller":
             if SellerManager.fire_employee(emp_id):
-                print(colorama.Fore.GREEN)
-                print("Seller Employee is Fired!")
+                print_successful("Seller Employee is Fired!")
     except Exception as e:
-        print(colorama.Fore.RED)
-        print(e, colorama.Fore.WHITE)
+        print_error(e)
 
 
 def give_employee_raise(employee_type):
@@ -202,8 +223,7 @@ def give_employee_raise(employee_type):
                 CustomerManager.raise_salary(emp_id, salary_raise)
                 success = True
             else:
-                print(colorama.Fore.RED)
-                print("No Such ID Was Found", colorama.Fore.WHITE)
+                print_error("No Such ID Was Found")
 
         elif employee_type == "seller":
 
@@ -212,15 +232,12 @@ def give_employee_raise(employee_type):
                 SellerManager.raise_salary(emp_id, salary_raise)
                 success = True
             else:
-                print(colorama.Fore.RED)
-                print("No Such ID Was Found", colorama.Fore.WHITE)
+                print_error("No Such ID Was Found")
         if success:
-            print(colorama.Fore.GREEN)
-            print(f"{employee_type} Employee was given a raise!")
+            print_successful(f"{employee_type} Employee was given a raise!")
 
     except Exception as e:
-        print(colorama.Fore.RED)
-        print(e, colorama.Fore.WHITE)
+        print_error(e)
 
 
 def show_all_employees(employee_type):
@@ -231,8 +248,7 @@ def show_all_employees(employee_type):
         employees = SellerManager.get_seller_employees()
 
     if len(employees) == 0:
-        print(colorama.Fore.RED)
-        print(f"No {employee_type} employees have been registered.")
+        print_error(f"No {employee_type} employees have been registered.")
         return
 
     for emp in employees:
@@ -256,20 +272,17 @@ def show_all_employees(employee_type):
 
 def show_all_users(employee_type):
     if employee_type == "customer":
-        users = CustomerEmployee.get_customers()
+        users = Customer.get_customers()
 
     elif employee_type == "seller":
         users = SellerEmployee.get_sellers()
 
     else:
-        print(colorama.Fore.RED)
-        print("Invalid user type.")
-        print(colorama.Fore.WHITE)
+        print_error("Invalid user type.")
         return
 
     if len(users) == 0:
-        print(colorama.Fore.RED)
-        print(f"No {employee_type}s have been registered.", colorama.Fore.WHITE)
+        print_error(f"No {employee_type}s have been registered.")
         return
 
     for user in users:
@@ -304,31 +317,26 @@ def show_all_users(employee_type):
 def generate_top3_report(employee_type):
     successfull = False
     if employee_type == "customer":
-        if len(CustomerEmployee.get_customers()) < 5:
-            print(colorama.Fore.RED)
-            print("Not enough data for report to generate.", colorama.Fore.WHITE)
+        if len(Customer.get_customers()) < 5:
+            print_error("Not enough data for report to generate.")
         else:
             try:
                 if Report.generate_top_customers_report():
                     successfull = True
             except Exception as e:
-                print(colorama.Fore.RED)
-                print(e, colorama.Fore.WHITE)
+                print_error(e)
     elif employee_type == "seller":
         if len(SellerEmployee.get_sellers()) < 5:
-            print(colorama.Fore.RED)
-            print("Not enough data for report to generate.", colorama.Fore.WHITE)
+            print_error("Not enough data for report to generate.")
         else:
             try:
                 if Report.generate_top_sellers_report():
                     successfull = True
             except Exception as e:
-                print(colorama.Fore.RED)
-                print(e, colorama.Fore.WHITE)
+                print_error(e)
 
     if successfull:
-        print(colorama.Fore.GREEN)
-        print("Generated Succesfully", colorama.Fore.WHITE)
+        print_successful("Generated Succesfully")
 
 
 def show_manager_account_info(manager):
@@ -345,93 +353,60 @@ def show_manager_account_info(manager):
 
 
 def signup_login_user(username, password, usertype):
-    if usertype == "customer":
-        try:
-            login, customer = Person.check_login(
-                "./Database/Customers.json", username, password
-            )
-            if login:
-                customer_obj = Customer.from_dict(customer)
-                customers_panel(customer_obj)
-                return True
-            else:
-                print(colorama.Fore.RED)
-                print(
-                    "Wrong Username or Password.",
-                    colorama.Fore.WHITE,
-                )
-                while True:
-                    signup_choice = input("\nDo you have an Account?\n1- Yes\n2- No\n")
-                    if signup_choice == "1":
-                        return False
-                    elif signup_choice == "2":
-                        while True:
 
-                            signedup, signedup_customer = signup_user("customer")
-                            if signedup:
-                                customers_panel(signedup_customer)
-                                return True
-                    else:
-                        print(colorama.Fore.RED)
-                        print(
-                            "Please only choose from options!",
-                            colorama.Fore.WHITE,
-                        )
-        except ValueError as e:
-            print(colorama.Fore.RED)
-            print(
-                e,
-                colorama.Fore.WHITE,
-            )
-    elif usertype == "seller":
-        try:
-            login, seller = Person.check_login(
-                "./Database/Sellers.json", username, password
-            )
-            if login:
-                seller_obj = Seller.from_dict(seller)
-                customers_panel(seller_obj)
-                return True
-            else:
-                print(colorama.Fore.RED)
-                print(
-                    "Wrong Username or Password.",
-                    colorama.Fore.WHITE,
-                )
-                while True:
-                    signup_choice = input("\nDo you have an Account?\n1- Yes\n2- No\n")
-                    if signup_choice == "1":
-                        return False
-                    elif signup_choice == "2":
-                        while True:
+    data = {
+        "customer": {
+            "file": "./Database/Customers.json",
+            "class": Customer,
+            "panel": customers_panel,
+        },
+        "seller": {
+            "file": "./Database/Sellers.json",
+            "class": Seller,
+            "panel": sellers_panel,
+        },
+    }
 
-                            signedup, signedup_customer = signup_user("seller")
-                            if signedup:
-                                sellers_panel(signedup_customer)
-                                return True
-                    else:
-                        print(colorama.Fore.RED)
-                        print(
-                            "Please only choose from options!",
-                            colorama.Fore.WHITE,
-                        )
-        except ValueError as e:
-            print(colorama.Fore.RED)
-            print(
-                e,
-                colorama.Fore.WHITE,
-            )
+    try:
+        user_data = data[usertype]
+
+        login, user = Person.check_login(user_data["file"], username, password)
+
+        if login:
+            user_obj = user_data["class"].from_dict(user)
+            user_data["panel"](user_obj)
+            return True
+
+        print_error("Wrong Username or Password.")
+
+        while True:
+            signup_choice = input("\nDo you have an Account?\n1- Yes\n2- No\n")
+
+            if signup_choice == "1":
+                return False
+
+            elif signup_choice == "2":
+
+                signedup, new_user = signup_user(usertype)
+
+                if signedup:
+                    user_data["panel"](new_user)
+                    return True
+
+            else:
+                print("Please only choose from options!")
+
+    except ValueError as e:
+        print_error(e)
 
 
 def signup_user(signup_type):
     try:
-        print(colorama.Fore.RED)
-        print("Enter 'e' on first input to exit\n", colorama.Fore.WHITE)
+        print_error("Enter 'e' on first input to exit\n")
 
         firstname = input("Enter Firstname:\n")
         if firstname == "e":
-            print(colorama.Fore.GREEN)
-            print("Exited signup!\n", colorama.Fore.WHITE)
+            print_successful("Exited signup!\n")
             return False, None
 
         Validator.validate_firstname(firstname)
@@ -442,9 +417,14 @@ def signup_user(signup_type):
         username = input("Enter Username:\n")
         Validator.validate_username(username)
 
-        for customer in CustomerEmployee.get_customers():
-            if customer["username"] == username:
-                raise ValueError("Username already exists.")
+        if signup_type == "customer":
+            for customer in Customer.get_customers():
+                if customer["username"] == username:
+                    raise ValueError("Username already exists.")
+        elif signup_type == "seller":
+            for seller in SellerEmployee.get_sellers():
+                if seller["username"] == username:
+                    raise ValueError("Username already exists.")
 
         password = input("Enter Password:\n")
         Validator.validate_password(password)
@@ -469,8 +449,7 @@ def signup_user(signup_type):
                 address,
                 save=True,
             )
-            print(colorama.Fore.GREEN)
-            print("Customer Signed up Successfully!", colorama.Fore.WHITE)
+            print_successful("Customer Signed up Successfully!")
 
         elif signup_type == "seller":
             user = Seller(
@@ -483,14 +462,156 @@ def signup_user(signup_type):
                 address,
                 save=True,
             )
-            print(colorama.Fore.GREEN)
-            print("Seller signed up Successfully!", colorama.Fore.WHITE)
+            print_successful(
+                "Seller signed up Successfully!\nAfter Being Approved, you can signin"
+            )
         return True, user
 
     except ValueError as e:
-        print(colorama.Fore.RED)
-        print(e, colorama.Fore.WHITE)
+        print_error(e)
         return False, None
+
+
+def show_products():
+    try:
+        products = Product.get_approved_products()
+        print(colorama.Fore.BLUE)
+        for product in products:
+            product_obj = Product.from_dict(product)
+            print(product_obj)
+        print(colorama.Fore.WHITE)
+
+    except ValueError as e:
+        print_error(e)
+
+
+def handle_customer_add_actions(customer, method):
+
+    actions = {"cart": customer.add_to_cart, "favorites": customer.add_to_favorites}
+
+    messages = {
+        "cart": "Enter Product ID To Add to cart:\n",
+        "favorites": "Enter Product ID To Add to favorites:\n",
+    }
+
+    while True:
+        try:
+            print_error("enter e to exit")
+            product_id = input(messages[method])
+
+            if product_id == "e":
+                break
+
+            product_id = int(product_id)
+
+            successful = actions[method](product_id)
+
+            if not successful:
+                print_error("Failed To do task")
+                continue
+
+            again = input("Anything Else?\n1- Yes\n2- No\n")
+
+            if again != "1":
+                break
+
+        except ValueError as e:
+            print_error(e)
+
+
+def handle_customer_remove_actions(customer, method):
+
+    actions = {
+        "cart": customer.remove_from_cart,
+        "favorites": customer.remove_from_favorites,
+    }
+
+    messages = {
+        "cart": "Enter Product ID To remove from cart:\n",
+        "favorites": "Enter Product ID To remove from favorites:\n",
+    }
+
+    if method not in actions:
+        print_error("Invalid remove action")
+
+    while True:
+        try:
+            print_error("enter e to exit")
+            product_id = input(messages[method])
+            if product_id == "e":
+                break
+
+            product_id = int(product_id)
+            successful = actions[method](product_id)
+
+            if successful:
+                print_successful("Removed Successfully")
+            else:
+                print_error("Failed To do task")
+
+            again = input("Anything Else?\n1- Yes\n2- No\n")
+
+            if again != "1":
+                break
+
+        except ValueError as e:
+            print_error(e)
+
+
+def show_customer_cart_and_favorites(customer_id):
+    print(colorama.Fore.BLUE)
+
+    customer = Customer.get_customer_byID(customer_id)
+
+    print("\n========== CART ==========")
+
+    if len(customer["cart"]) == 0:
+        print("Your cart is empty.")
+    else:
+        for product_id in customer["cart"]:
+            product = Product.get_product_byID(product_id)
+
+            if product:
+                print(
+                    f"ID: {product['id']}\n"
+                    f"Name: {product['name']}\n"
+                    f"Brand: {product['brand']}\n"
+                    f"Price: {product['price']}\n"
+                    f"Category: {product['category']}\n"
+                    f"-------------------------\n"
+                )
+
+    # Favorites
+    print("\n======== FAVORITES ========")
+
+    if len(customer["favorites"]) == 0:
+        print("Your favorites are empty.")
+    else:
+        for product_id in customer["favorites"]:
+            product = Product.get_product_byID(product_id)
+
+            if product:
+                print(
+                    f"ID: {product['id']}\n"
+                    f"Name: {product['name']}\n"
+                    f"Brand: {product['brand']}\n"
+                    f"Price: {product['price']}\n"
+                    f"Category: {product['category']}\n"
+                    f"-------------------------\n"
+                )
+
+    print(colorama.Fore.WHITE)
+
+
+def add_cart_to_favorites(customer):
+    try:
+        if Customer.add_cart_to_favorites(customer.id):
+            print_successful("Favorites added to cart successfully!")
+        else:
+            print_error("Customer not found.")
+
+    except ValueError as e:
+        print_error(e)
 
 
 # Panels -----------------------------------------------------------------
@@ -498,10 +619,9 @@ def signup_user(signup_type):
 
 def customers_panel(customer):
     while True:
-        print(colorama.Fore.GREEN)
-        print(
-            f"Welcome Customer {customer.firstname} {customer.lastname}!\n",
-            colorama.Fore.WHITE,
+
+        print_successful(
+            f"Welcome Customer {customer.firstname} {customer.lastname}!\n"
         )
 
         show_customer_menu()
@@ -509,51 +629,59 @@ def customers_panel(customer):
 
         match choice:
             case "1":
-                pass
+                customers_Shop_panel(customer)
             case "2":
-                pass
+                customers_Ticket_panel(customer)
             case "3":
-                pass
+                print(colorama.Fore.BLUE)
+                print(customer)
             case "4":
-                pass
+                break
             case _:
-                print(colorama.Fore.RED)
-                print("Please only choose from options")
+                print_error("Please only choose from options")
 
 
 def customers_Shop_panel(customer):
     while True:
-        print(colorama.Fore.GREEN)
-        print(
-            f"Welcome Customer {customer.firstname} {customer.lastname}!\n",
-            colorama.Fore.WHITE,
+        print_successful(
+            f"Welcome Customer {customer.firstname} {customer.lastname}!\n"
         )
+
+        show_products()
+
         show_customer_shop_menu()
         choice = input("Please Choose:\n")
 
         match choice:
-
             case "1":
-                pass
+                try:
+                    customer.checkout()
+                except ValueError as e:
+                    print_error(e)
             case "2":
-                pass
+                handle_customer_add_actions(customer, "cart")
             case "3":
-                pass
+                handle_customer_add_actions(customer, "favorites")
             case "4":
-                pass
+                add_cart_to_favorites(customer)
+            case "5":
+                handle_customer_remove_actions(customer, "cart")
+            case "6":
+                handle_customer_remove_actions(customer, "favorites")
+            case "7":
+                show_customer_cart_and_favorites(customer.id)
+            case "8":
+                break
             case _:
-                print(colorama.Fore.RED)
-                print("Please only choose from options")
+                print_error("Please only choose from options")
 
 
 def customers_Ticket_panel(customer):
     while True:
-        print(colorama.Fore.GREEN)
-        print(
-            f"Welcome Customer {customer.firstname} {customer.lastname}!\n",
-            colorama.Fore.WHITE,
+        print_successful(
+            f"Welcome Customer {customer.firstname} {customer.lastname}!\n"
         )
-        show_customer_ticket_menu()
+        show_ticket_menu()
         choice = input("Please Choose:\n")
 
         match choice:
@@ -567,8 +695,7 @@ def customers_Ticket_panel(customer):
             case "4":
                 pass
             case _:
-                print(colorama.Fore.RED)
-                print("Please only choose from options")
+                print_error("Please only choose from options")
 
 
 def sellers_panel(seller):
@@ -585,10 +712,8 @@ def seller_employee_panel(seller_employee):
 
 def show_employee_manager_panel(manager, employee_type):
     while True:
-        print(colorama.Fore.GREEN)
-        print(
-            f"Welcome {employee_type.capitalize()} Manager {manager.firstname} {manager.lastname}!\n",
-            colorama.Fore.WHITE,
+        print_successful(
+            f"Welcome {employee_type.capitalize()} Manager {manager.firstname} {manager.lastname}!\n"
         )
 
         if employee_type == "customer":
@@ -627,8 +752,10 @@ def show_employee_manager_panel(manager, employee_type):
                 break
 
             case _:
-                print(colorama.Fore.RED)
-                print("Please only choose from options")
+                print_error("Please only choose from options")
+
+
+# Main -----------------------------------------------------------------------
 
 
 def main():
@@ -662,15 +789,9 @@ def main():
 
             match choice:
                 case "1":
-                    login = signup_login_customer(username, password)
+                    login = signup_login_user(username, password, "customer")
                 case "2":
-                    login, seller = Person.check_login(
-                        "./Database/Sellers.json", username, password
-                    )
-                    seller_obj = Seller.from_dict(seller)
-                    if login:
-                        sellers_panel(seller_obj)
-
+                    login = signup_login_user(username, password, "seller")
                 case "3":
                     login, customer_employee = Person.check_login(
                         "./Database/CustomerEmployees.json", username, password
@@ -712,8 +833,7 @@ def main():
             print(colorama.Fore.RED, "\nBye!\n", colorama.Fore.WHITE)
             break
         else:
-            print(colorama.Fore.RED)
-            print("Please only choose from options!", colorama.Fore.WHITE)
+            print_error("Please only choose from options")
 
 
 if __name__ == "__main__":

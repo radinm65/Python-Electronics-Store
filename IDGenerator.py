@@ -27,10 +27,7 @@ class IDGenerator:
         return self.current
     
 
-ticket_id_generator = IDGenerator([
-    "./Database/CustomerTickets.json",
-    "./Database/SellerTickets.json"
-])
+ticket_id_generator = IDGenerator("./Database/Tickets.json")
 
 product_id_generator = IDGenerator([
     "./Database/ApprovedProducts.json",

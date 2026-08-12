@@ -183,6 +183,24 @@ class Customer(User):
                 )
 
         return False
+    
+    @staticmethod
+    def add_to_balance(customer_id, balance):
+
+        customers = Customer.get_customers()
+
+        for customer in customers:
+
+            if customer["id"] == customer_id:
+
+                customer["balance"] += balance
+
+                return FileCommands.save_file_data(
+                    "./Database/Customers.json",
+                    customers
+                )
+
+        return False
 
     @staticmethod
     def from_dict(data):

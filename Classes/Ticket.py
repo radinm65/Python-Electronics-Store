@@ -24,10 +24,7 @@ class Ticket:
                 "sender_type": self.sender_type,
                 "date_created": self.date_created.isoformat(),
             }
-            if new_ticket["sender_type"] == "customer":
-                FileCommands.add_data("./Database/CustomersTickets.json", new_ticket)
-            else:
-                FileCommands.add_data("./Database/SellersTickets.json", new_ticket)
+            FileCommands.add_data("./Database/Tickets.json", new_ticket)
 
     @property
     def request(self):
@@ -59,32 +56,27 @@ class Ticket:
     def sender_type(self, new_type):
         Validator.validate_sender_type(new_type)
         self.__sender_type = new_type
-
-    def __str__(self):
-        return (
-            f"ID: {self.id}\n"
-            f"From: {self.from_name}\n"
-            f"From ID: {self.from_id}\n"
-            f"Request: {self.request}\n"
-            f"Response: {self.response}\n"
-            f"Date Created: {self.date_created}"
-        )
         
     @staticmethod    
-    def get_customers_tickets():
-        return FileCommands.get_file_data("./Database/CustomersTickets.json")
+    def get_all_tickets():
+        return FileCommands.get_file_data("./Database/Tickets.json")
     
     @staticmethod    
-    def get_sellers_tickets():
-        return FileCommands.get_file_data("./Database/SellersTickets.json")
+    def get_sendertype_tickets(sender_type):
+        user_tickets = []
+        all_tickets = Ticket.get_all_tickets()
+        for ticket in all_tickets:
+            if ticket["sender_type"] == sender_type:
+                user_tickets.append(ticket)
+        return user_tickets
     
     @staticmethod
     def get_user_tickets(user_id, sender_type):
         user_tickets = []
         if sender_type == "customer":
-            tickets = Ticket.get_customers_tickets()
+            tickets = Ticket.get_sendertype_tickets("customer")
         else: 
-            tickets = Ticket.get_sellers_tickets()
+            tickets = Ticket.get_sendertype_tickets("seller")
                 
         for ticket in tickets:
             if ticket["from_id"] == user_id:
@@ -104,3 +96,14 @@ class Ticket:
         ticket.id = ticket_dict["id"]
         
         return ticket
+    
+    
+    def __str__(self):
+            return (
+                f"ID: {self.id}\n"
+                f"From: {self.from_name}\n"
+                f"From ID: {self.from_id}\n"
+                f"Request: {self.request}\n"
+                f"Response: {self.response}\n"
+                f"Date Created: {self.date_created}"
+            )

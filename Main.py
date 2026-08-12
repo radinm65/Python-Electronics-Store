@@ -7,6 +7,7 @@ from Classes.Seller import Seller
 from Classes.CustomerEmployee import CustomerEmployee
 from Classes.SellerEmployee import SellerEmployee
 from Classes.Product import Product
+from Classes.Ticket import Ticket
 from Report import Report
 from Validator import Validator
 
@@ -56,7 +57,8 @@ def show_customer_shop_menu():
         "5- Delete From Cart\n"
         "6- Delete From Favorites\n"
         "7- See Cart and Favorites\n"
-        "8- Back\n",
+        "8- Add to balance\n",
+        "9- Back\n",
         colorama.Fore.WHITE,
     )
 
@@ -64,7 +66,7 @@ def show_customer_shop_menu():
 def show_ticket_menu():
     print(colorama.Fore.YELLOW)
     print(
-        "1- See Submited tickets\n" "2- Submit Ticket\n" "3- Back\n",
+        "1- Submit Ticket\n" "2- See Submited tickets\n" "3- Back\n",
         colorama.Fore.WHITE,
     )
 
@@ -612,6 +614,44 @@ def add_cart_to_favorites(customer):
 
     except ValueError as e:
         print_error(e)
+        
+        
+def submit_ticket(user, sender_type):
+    try:
+        request = input("What is the problem?\n")
+        Validator.validate_ticket_request(request)
+        new_ticket = Ticket(user.firstname, user.id, request, sender_type, True)
+        print_successful("New Ticket Submitted")
+    except ValueError as e:
+        print_error(e)
+        
+def see_user_tickets(user, sender_type):
+    try:
+        user_tickets = Ticket.get_user_tickets(user.id, sender_type)
+        
+        print(colorama.Fore.BLUE)
+        print("======= User Tickets =======\n")
+        for ticket in user_tickets:
+            ticket_obj = Ticket.from_dict(ticket)
+            print(ticket_obj, end="\n\n")
+            
+        
+    except ValueError as e:
+            print_error(e)
+            
+
+def add_to_balance(user):
+    try:
+        add_balance = int(input("Enter amount to add to balance:\n"))
+        Validator.validate_balance(add_balance)
+        if Customer.add_to_balance(user.id, add_balance):
+            print_successful(f"Balance was added.")
+        else:
+            print_error("Error in adding balance.")
+                
+            
+    except ValueError as e:
+        print_error(e)
 
 
 # Panels -----------------------------------------------------------------
@@ -634,7 +674,8 @@ def customers_panel(customer):
                 customers_Ticket_panel(customer)
             case "3":
                 print(colorama.Fore.BLUE)
-                print(customer)
+                customer_obj = Customer.from_dict(Customer.get_customer_byID(customer.id))
+                print(customer_obj)
             case "4":
                 break
             case _:
@@ -671,6 +712,8 @@ def customers_Shop_panel(customer):
             case "7":
                 show_customer_cart_and_favorites(customer.id)
             case "8":
+                add_to_balance(customer)
+            case "9":
                 break
             case _:
                 print_error("Please only choose from options")
@@ -685,15 +728,12 @@ def customers_Ticket_panel(customer):
         choice = input("Please Choose:\n")
 
         match choice:
-
             case "1":
-                pass
+                submit_ticket(customer, "customer")
             case "2":
-                pass
+                see_user_tickets(customer, "customer")
             case "3":
-                pass
-            case "4":
-                pass
+                break
             case _:
                 print_error("Please only choose from options")
 

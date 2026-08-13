@@ -27,23 +27,38 @@ class Seller(User):
                 "address": self.address,
                 "balance": self.balance,
                 "selling_products": self.selling_products,
-                "sold": self.sold
+                "sold": self.sold,
             }
             FileCommands.add_data("./Database/UnapprovedSellers.json", new_seller)
-        
-        
-    def make_product(self, name, brand, price, category):
-        return Product(name, brand, price, category, self.id)
-            
+
+
     def get_seller_unapproved_products(self):
         seller_unapproved_products = []
-        unapproved_products = FileCommands.get_file_data("./Database/UnapprovedProducts.json")
+        unapproved_products = FileCommands.get_file_data(
+            "./Database/UnapprovedProducts.json"
+        )
         for up in unapproved_products:
             if up["seller_id"] == self.id:
                 seller_unapproved_products.append(up)
         return seller_unapproved_products
+
+    @staticmethod
+    def get_sellers():
+        return FileCommands.get_file_data("./Database/Sellers.json")
+
+    @staticmethod
+    def get_seller_byID(seller_id):
+        sellers = Seller.get_sellers()
+        found_seller = next(
+            (seller for seller in sellers if seller["id"] == seller_id), None
+        )
+        return found_seller
     
-    
+    @staticmethod
+    def delete_product_from_seller(seller_json, product_id):
+        seller_json["selling_products"] = [product_id_json for product_id_json in seller_json["selling_products"] if product_id_json != product_id]
+        return FileCommands.edit_data("./Database/Sellers.json", seller_json)
+        
     @classmethod
     def from_dict(cls, data):
         seller = cls(
@@ -54,7 +69,7 @@ class Seller(User):
             str(data["age"]),
             data["phone_num"],
             data["address"],
-            save=False
+            save=False,
         )
 
         seller.set_hashed_password(data["password"])
@@ -63,4 +78,18 @@ class Seller(User):
         seller.selling_products = data["selling_products"]
         seller.sold = data["sold"]
 
-        return seller            
+        return seller
+
+    def __str__(self):
+        return (
+            f"ID: {self.id}\n"
+            f"Firstname: {self.firstname}\n"
+            f"Lastname: {self.lastname}\n"
+            f"Username: {self.username}\n"
+            f"Age: {self.age}\n"
+            f"Phone_num: {self.phone_num}\n"
+            f"Address: {self.address}\n"
+            f"Balance: {self.balance}\n"
+            f"Selling products ID: {self.selling_products}\n"
+            f"Sold: {self.sold}\n"
+        )

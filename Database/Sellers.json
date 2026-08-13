@@ -1,26 +1,19 @@
 [
     {
         "id": 1,
-        "firstname": "Arman",
-        "lastname": "Karimi",
-        "username": "arman101",
-        "password": "Arman123!",
-        "age": "28",
-        "phone_num": "0912345678",
-        "address": "Tehran Valiasr Street",
-        "balance": 15000,
-        "selling_products": [
-            1,
-            3
-        ],
+        "firstname": "Radin",
+        "lastname": "Motahhary",
+        "username": "radinm123",
+        "password": "3248fffb9b920086361bf40d80a2f3fd1039f1839a5dbc39160f06b09a968011",
+        "age": 18,
+        "phone_num": "9379499511",
+        "address": "Karaj Golha",
+        "balance": 0,
+        "selling_products": [1],
         "sold": [
             {
                 "product_id": 1,
                 "date": "2026-08-02T10:30:00"
-            },
-            {
-                "product_id": 3,
-                "date": "2026-09-05T15:20:00"
             }
         ]
     },
@@ -35,17 +28,12 @@
         "address": "Shiraz Eram Boulevard",
         "balance": 23000,
         "selling_products": [
-            2,
-            5
+            2
         ],
         "sold": [
             {
                 "product_id": 2,
                 "date": "2026-08-10T12:00:00"
-            },
-            {
-                "product_id": 5,
-                "date": "2026-09-12T18:45:00"
             }
         ]
     },
@@ -60,22 +48,12 @@
         "address": "Mashhad Ferdowsi Avenue",
         "balance": 32000,
         "selling_products": [
-            4,
-            1,
-            2
+            3
         ],
         "sold": [
             {
-                "product_id": 4,
-                "date": "2026-08-15T09:15:00"
-            },
-            {
-                "product_id": 1,
-                "date": "2026-09-20T11:30:00"
-            },
-            {
-                "product_id": 2,
-                "date": "2026-09-25T16:00:00"
+                "product_id": 3,
+                "date": "2026-09-05T15:20:00"
             }
         ]
     },
@@ -90,11 +68,11 @@
         "address": "Tabriz Azadi Square",
         "balance": 18000,
         "selling_products": [
-            5
+            4
         ],
         "sold": [
             {
-                "product_id": 5,
+                "product_id": 4,
                 "date": "2026-08-20T14:10:00"
             }
         ]
@@ -110,35 +88,13 @@
         "address": "Isfahan Chaharbagh Street",
         "balance": 68000,
         "selling_products": [
-            3,
-            4
+            5
         ],
         "sold": [
             {
-                "product_id": 3,
-                "date": "2026-08-25T17:40:00"
-            },
-            {
-                "product_id": 4,
-                "date": "2026-09-28T13:00:00"
-            },
-            {
                 "product_id": 5,
-                "date": "2026-08-06T14:30:41.276807"
+                "date": "2026-08-25T17:40:00"
             }
         ]
-    },
-    {
-        "id": 6,
-        "firstname": "Radin",
-        "lastname": "Motahhary",
-        "username": "radinm123",
-        "password": "3248fffb9b920086361bf40d80a2f3fd1039f1839a5dbc39160f06b09a968011",
-        "age": 18,
-        "phone_num": "9379499511",
-        "address": "Karaj Golha",
-        "balance": 0,
-        "selling_products": [],
-        "sold": []
     }
 ]

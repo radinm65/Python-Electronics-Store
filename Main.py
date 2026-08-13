@@ -57,7 +57,7 @@ def show_customer_shop_menu():
         "5- Delete From Cart\n"
         "6- Delete From Favorites\n"
         "7- See Cart and Favorites\n"
-        "8- Add to balance\n",
+        "8- Add to balance\n"
         "9- Back\n",
         colorama.Fore.WHITE,
     )
@@ -83,9 +83,11 @@ def show_seller_product_menu():
     print(colorama.Fore.YELLOW)
     print(
         "1- Make Product\n"
-        "2- See Unapproved Products\n"
-        "3- See Selling Products\n"
-        "4- Back\n",
+        "2- See Selling Products\n"
+        "3- See Unapproved Products\n"
+        "4- Delete Products from selling list\n"
+        "5- Edit Product\n"
+        "6- Back\n",
         colorama.Fore.WHITE,
     )
 
@@ -503,6 +505,9 @@ def handle_customer_add_actions(customer, method):
 
             if product_id == "e":
                 break
+            elif not product_id.isdigit():
+                print_error("Enter number for ID.")
+                continue
 
             product_id = int(product_id)
 
@@ -512,7 +517,7 @@ def handle_customer_add_actions(customer, method):
                 print_error("Failed To do task")
                 continue
 
-            again = input("Anything Else?\n1- Yes\n2- No\n")
+            again = input("Anything Else?\n1- Yes\n")
 
             if again != "1":
                 break
@@ -614,8 +619,8 @@ def add_cart_to_favorites(customer):
 
     except ValueError as e:
         print_error(e)
-        
-        
+
+
 def submit_ticket(user, sender_type):
     try:
         request = input("What is the problem?\n")
@@ -624,21 +629,21 @@ def submit_ticket(user, sender_type):
         print_successful("New Ticket Submitted")
     except ValueError as e:
         print_error(e)
-        
+
+
 def see_user_tickets(user, sender_type):
     try:
         user_tickets = Ticket.get_user_tickets(user.id, sender_type)
-        
+
         print(colorama.Fore.BLUE)
         print("======= User Tickets =======\n")
         for ticket in user_tickets:
             ticket_obj = Ticket.from_dict(ticket)
             print(ticket_obj, end="\n\n")
-            
-        
+
     except ValueError as e:
-            print_error(e)
-            
+        print_error(e)
+
 
 def add_to_balance(user):
     try:
@@ -648,10 +653,175 @@ def add_to_balance(user):
             print_successful(f"Balance was added.")
         else:
             print_error("Error in adding balance.")
-                
-            
+
     except ValueError as e:
         print_error(e)
+
+
+def print_account_info(user, user_type):
+    print(colorama.Fore.BLUE)
+    user_obj = None
+    if user_type == "customer":
+        user_obj = Customer.from_dict(Customer.get_customer_byID(user.id))
+    elif user_type == "seller":
+        user_obj = Seller.from_dict(Seller.get_seller_byID(user.id))
+    print(user_obj)
+
+
+def make_product(seller):
+    while True:
+        try:
+            print_error("Enter e on first input to exit.\n")
+            name = input("Enter name of product:\n")
+
+            if name == "e":
+                print_successful("Exited registering product!\n")
+                break
+
+            Validator.validate_product_name(name)
+
+            brand = input("\nEnter brand:\n")
+            Validator.validate_brand(brand)
+
+            price = input("\nEnter price:\n")
+            Validator.validate_price(price)
+
+            category = input("\nEnter category: (Phone, Laptop, Camera)\n")
+            Validator.validate_category(category)
+
+            new_product = Product(name, brand, price, category, seller.id, True)
+
+            if new_product:
+                print_successful(
+                    f"Product with ID {new_product.id} has been made and has to be approved.\n"
+                )
+                register_again = input("Register another?\n1- Yes\n")
+                if register_again != "1":
+                    break
+
+        except ValueError as e:
+            print_error(e)
+
+
+def see_seller_unapproved_products(seller):
+    try:
+        print(colorama.Fore.BLUE)
+        print("\n====== Unapproved Products ======\n")
+        unapproved_products = seller.get_seller_unapproved_products()
+        for up in unapproved_products:
+            product_obj = Product.from_dict(up)
+            print(product_obj, end="\n\n")
+    except ValueError as e:
+        print_error(e)
+
+
+def see_seller_selling_products(seller):
+    try:
+        print(colorama.Fore.BLUE)
+        print("\n====== Selling Products ======\n")
+        seller_json = Seller.get_seller_byID(seller.id)
+        for selling_product_id in seller_json["selling_products"]:
+            product_obj = Product.from_dict(
+                Product.get_product_byID(selling_product_id)
+            )
+            print(product_obj, end="\n\n")
+    except ValueError as e:
+        print_error(e)
+
+
+def delete_product_from_seller(seller):
+    while True:
+        try:
+            product_id = input("Enter Product ID to delete (Enter 'e' to exit):\n")
+
+            if product_id.lower() == "e":
+                print_successful("Exited Deleting product!\n")
+                break
+
+            if not product_id.isdigit():
+                print_error("Product ID must be a number.\n")
+                continue
+            
+            product_id = int(product_id)
+
+            seller_json = Seller.get_seller_byID(seller.id)
+            if product_id not in seller_json["selling_products"]:
+                print_error("This product does not belong to you.\n")
+                continue
+            else:
+                if Seller.delete_product_from_seller(seller_json, product_id):
+                    print_successful("Product was removed from your selling products successfully!\n")
+                    again = input("Do you want to delete another product?\n1- Yes\n")
+                    if again != "1":
+                        break
+
+        except ValueError as e:
+            print_error(e)
+
+
+def edit_product(seller):
+    while True:
+        try:
+            product_id = input("\nEnter Product ID to edit (Enter 'e' to exit):\n")
+            if product_id.lower() == "e":
+                print_successful("Exited Editing product!\n")
+                break
+            if not product_id.isdigit():
+                print_error("Product ID must be a number.\n")
+                continue
+
+            product_id = int(product_id)
+            
+            seller_json = Seller.get_seller_byID(seller.id)
+            if product_id not in seller_json["selling_products"]:
+                print_error("This product does not belong to you.\n")
+                continue
+
+            product = Product.get_product_byID(product_id)
+
+            print(
+                "\nWhich field do you want to edit?\n"
+                "1- Name\n"
+                "2- Brand\n"
+                "3- Price\n"
+                "4- Category\n"
+            )
+
+            choice = input("Enter your choice:\n")
+
+            match choice:
+                case "1":
+                    new_name = input("Enter new name:\n")
+                    Validator.validate_product_name(new_name)
+                    product["name"] = new_name
+
+                case "2":
+                    new_brand = input("Enter new brand:\n")
+                    Validator.validate_brand(new_brand)
+                    product["brand"] = new_brand
+
+                case "3":
+                    new_price = input("Enter new price:\n")
+                    Validator.validate_price(new_price)
+                    product["price"] = int(new_price)
+
+                case "4":
+                    new_category = input("Enter new category:\n")
+                    Validator.validate_category(new_category)
+                    product["category"] = new_category
+
+                case _:
+                    print_error("Invalid choice.\n")
+                    continue
+
+            if Product.edit_product(product):
+                print_successful("Product was edited successfully!\n")
+                again = input("Do you want to edit another product?\n1- Yes\n")
+                if again != "1":
+                    break
+
+        except ValueError as e:
+            print_error(e)
 
 
 # Panels -----------------------------------------------------------------
@@ -671,11 +841,9 @@ def customers_panel(customer):
             case "1":
                 customers_Shop_panel(customer)
             case "2":
-                customers_Ticket_panel(customer)
+                Ticket_panel(customer, "customer")
             case "3":
-                print(colorama.Fore.BLUE)
-                customer_obj = Customer.from_dict(Customer.get_customer_byID(customer.id))
-                print(customer_obj)
+                print_account_info(customer, "customer")
             case "4":
                 break
             case _:
@@ -719,19 +887,17 @@ def customers_Shop_panel(customer):
                 print_error("Please only choose from options")
 
 
-def customers_Ticket_panel(customer):
+def Ticket_panel(user, submit_type):
     while True:
-        print_successful(
-            f"Welcome Customer {customer.firstname} {customer.lastname}!\n"
-        )
+        print_successful(f"Welcome {submit_type} {user.firstname} {user.lastname}!\n")
         show_ticket_menu()
         choice = input("Please Choose:\n")
 
         match choice:
             case "1":
-                submit_ticket(customer, "customer")
+                submit_ticket(user, submit_type)
             case "2":
-                see_user_tickets(customer, "customer")
+                see_user_tickets(user, submit_type)
             case "3":
                 break
             case _:
@@ -739,10 +905,55 @@ def customers_Ticket_panel(customer):
 
 
 def sellers_panel(seller):
-    pass
+    while True:
+        print_successful(f"Welcome seller {seller.firstname} {seller.lastname}!\n")
+
+        show_seller_menu()
+        choice = input("Please Choose:\n")
+
+        match choice:
+            case "1":
+                sellers_product_panel(seller)
+            case "2":
+                Ticket_panel(seller, "seller")
+            case "3":
+                print_account_info(seller, "seller")
+            case "4":
+                break
+            case _:
+                print_error("Please only choose from options")
 
 
-def customer_employee_panel(customer_employee):
+def sellers_product_panel(seller):
+
+    while True:
+        print_successful(f"Welcome Seller {seller.firstname} {seller.lastname}!\n")
+
+        show_seller_product_menu()
+        choice = input("Please Choose:\n")
+        match choice:
+            case "1":
+                make_product(seller)
+                pass
+            case "2":
+                see_seller_selling_products(seller)
+                pass
+            case "3":
+                see_seller_unapproved_products(seller)
+                pass
+            case "4":
+                delete_product_from_seller(seller)
+                pass
+            case "5":
+                edit_product(seller)
+                pass
+            case "6":
+                break
+            case _:
+                print_error("Please only choose from options")
+
+
+def seller_customer_panel(customer_employee):
     pass
 
 

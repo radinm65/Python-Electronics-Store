@@ -74,6 +74,14 @@ class Product:
         return FileCommands.save_file_data("./Database/ApprovedProducts.json", approvedProducts)
 
     @staticmethod
+    def delete_product(product_id):
+        return FileCommands.delete_data("./Database/ApprovedProducts.json", product_id)
+
+    @staticmethod
+    def edit_product(json_product):
+        return FileCommands.edit_data("./Database/ApprovedProducts.json", json_product)
+
+    @staticmethod
     def get_product_byID(product_id):
         products = Product.get_approved_products()
         found_product = next(

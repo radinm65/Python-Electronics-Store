@@ -32,10 +32,6 @@ class SellerEmployee(Employee):
         self.id = seller_employee_id_generator.next_id()
 
     @staticmethod
-    def get_sellers():
-        return FileCommands.get_file_data("./Database/Sellers.json")
-
-    @staticmethod
     def save_sellers(sellers):
         return FileCommands.save_file_data("./Database/Sellers.json", sellers)
 

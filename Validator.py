@@ -135,11 +135,6 @@ class Validator:
                 "Product name should be longer than 3 characters."
             )
 
-        if any(char.isdigit() for char in name):
-            raise ValueError(
-                "Product name shouldn't have numbers."
-            )
-
 
     @staticmethod
     def validate_brand(brand):

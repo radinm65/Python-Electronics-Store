@@ -93,7 +93,19 @@ def show_seller_product_menu():
 
 
 def show_customer_employee_menu():
-    pass
+    print(colorama.Fore.YELLOW)
+    print(
+        "1- Tickets Panel\n" "2- Remove Customer\n" "3- Account Info\n" "4- Back\n",
+        colorama.Fore.WHITE,
+    )
+
+
+def show_employee_Ticket_menu():
+    print(colorama.Fore.YELLOW)
+    print(
+        "1- Answer Ticket\n" "2- See all tickets\n" "3- Back\n",
+        colorama.Fore.WHITE,
+    )
 
 
 def show_seller_employee_menu():
@@ -136,72 +148,74 @@ def show_seller_employee_manager_menu():
 
 
 def hire_employee(employee_type):
-    try:
-        print_error("Enter 'e' on first input to exit\n")
+    while True:
+        try:
+            print_error("Enter 'e' on first input to exit\n")
 
-        firstname = input("Enter Firstname:\n")
-        if firstname == "e":
-            print_successful("Exited Hiring!\n")
-            return True
+            firstname = input("Enter Firstname:\n")
+            if firstname == "e":
+                print_successful("Exited Hiring!\n")
+                return True
 
-        Validator.validate_firstname(firstname)
+            Validator.validate_firstname(firstname)
 
-        lastname = input("Enter Lastname:\n")
-        Validator.validate_lastname(lastname)
+            lastname = input("Enter Lastname:\n")
+            Validator.validate_lastname(lastname)
 
-        username = input("Enter Username:\n")
-        Validator.validate_username(username)
+            username = input("Enter Username:\n")
+            Validator.validate_username(username)
 
-        password = input("Enter Password:\n")
-        Validator.validate_password(password)
+            password = input("Enter Password:\n")
+            Validator.validate_password(password)
 
-        age = input("Enter age:\n")
-        Validator.validate_age(age)
+            age = input("Enter age:\n")
+            Validator.validate_age(age)
 
-        phone_num = input("Enter Phone number:\n")
-        Validator.validate_phone(phone_num)
+            phone_num = input("Enter Phone number:\n")
+            Validator.validate_phone(phone_num)
 
-        address = input("Enter Address:\n")
-        Validator.validate_address(address)
+            address = input("Enter Address:\n")
+            Validator.validate_address(address)
 
-        bank_account_num = input("Enter Bank Account Number:\n")
-        Validator.validate_bank_account(bank_account_num)
+            bank_account_num = input("Enter Bank Account Number:\n")
+            Validator.validate_bank_account(bank_account_num)
 
-        salary = int(input("Enter Salary:\n"))
-        Validator.validate_salary(salary)
+            salary = int(input("Enter Salary:\n"))
+            Validator.validate_salary(salary)
 
-        if employee_type == "customer":
-            CustomerManager.hire_employee(
-                firstname,
-                lastname,
-                username,
-                password,
-                age,
-                phone_num,
-                address,
-                bank_account_num,
-                salary,
-            )
-            print_successful("Customer Employee has Been Hired Successfully!")
+            if employee_type == "customer":
+                CustomerManager.hire_employee(
+                    firstname,
+                    lastname,
+                    username,
+                    password,
+                    age,
+                    phone_num,
+                    address,
+                    bank_account_num,
+                    salary,
+                )
+                print_successful("Customer Employee has Been Hired Successfully!")
 
-        elif employee_type == "seller":
-            SellerManager.hire_employee(
-                firstname,
-                lastname,
-                username,
-                password,
-                age,
-                phone_num,
-                address,
-                bank_account_num,
-                salary,
-            )
-            print_successful("Seller Employee has Been Hired Successfully!")
-        return True
+            elif employee_type == "seller":
+                SellerManager.hire_employee(
+                    firstname,
+                    lastname,
+                    username,
+                    password,
+                    age,
+                    phone_num,
+                    address,
+                    bank_account_num,
+                    salary,
+                )
+                print_successful("Seller Employee has Been Hired Successfully!")
 
-    except ValueError as e:
-        print_error(e)
-        return False
+            break
+
+        except ValueError as e:
+            print_error(e)
+            continue
 
 
 def fire_employee(employee_type):
@@ -274,11 +288,11 @@ def show_all_employees(employee_type):
     print(colorama.Fore.WHITE)
 
 
-def show_all_users(employee_type):
-    if employee_type == "customer":
-        users = Customer.get_customers()
+def show_all_users(user_type):
+    if user_type == "customer":
+        users = CustomerEmployee.get_customers()
 
-    elif employee_type == "seller":
+    elif user_type == "seller":
         users = SellerEmployee.get_sellers()
 
     else:
@@ -286,7 +300,7 @@ def show_all_users(employee_type):
         return
 
     if len(users) == 0:
-        print_error(f"No {employee_type}s have been registered.")
+        print_error(f"No {user_type}s have been registered.")
         return
 
     for user in users:
@@ -300,20 +314,22 @@ def show_all_users(employee_type):
             f"Age: {user['age']}\n"
             f"Phone_num: {user['phone_num']}\n"
             f"Address: {user['address']}\n"
-            f"Balance: {user['balance']}\n"
+            f"Balance: {user['balance']}\n",
+            end="",
         )
 
-        if employee_type == "customer":
+        if user_type == "customer":
             print(
                 f"Cart: {user['cart']}\n"
                 f"Favorites: {user['favorites']}\n"
-                f"Bought: {user['bought']}\n"
+                f"Bought: {user['bought']}\n",
+                end="\n----------------------------------\n",
             )
 
-        elif employee_type == "seller":
-            print(f"Sold: {user['sold']}\n")
-
-        print()
+        elif user_type == "seller":
+            print(
+                f"Sold: {user['sold']}\n", end="\n----------------------------------\n"
+            )
 
     print(colorama.Fore.WHITE)
 
@@ -321,7 +337,7 @@ def show_all_users(employee_type):
 def generate_top3_report(employee_type):
     successfull = False
     if employee_type == "customer":
-        if len(Customer.get_customers()) < 5:
+        if len(CustomerEmployee.get_customers()) < 5:
             print_error("Not enough data for report to generate.")
         else:
             try:
@@ -363,11 +379,25 @@ def signup_login_user(username, password, usertype):
             "file": "./Database/Customers.json",
             "class": Customer,
             "panel": customers_panel,
+            "can_signup": True,
         },
         "seller": {
             "file": "./Database/Sellers.json",
             "class": Seller,
             "panel": sellers_panel,
+            "can_signup": True,
+        },
+        "customer_employee": {
+            "file": "./Database/CustomerEmployees.json",
+            "class": CustomerEmployee,
+            "panel": customer_employee_panel,
+            "can_signup": False,
+        },
+        "seller_employee": {
+            "file": "./Database/SellerEmployees.json",
+            "class": SellerEmployee,
+            "panel": seller_employee_panel,
+            "can_signup": False,
         },
     }
 
@@ -377,14 +407,27 @@ def signup_login_user(username, password, usertype):
         login, user = Person.check_login(user_data["file"], username, password)
 
         if login:
-            user_obj = user_data["class"].from_dict(user)
+
+            if usertype in [
+                "customer",
+                "seller",
+                "customer_employee",
+                "seller_employee",
+            ]:
+                user_obj = user_data["class"].from_dict(user)
+
             user_data["panel"](user_obj)
+
             return True
 
         print_error("Wrong Username or Password.")
 
+        if not user_data["can_signup"]:
+            return False
+
         while True:
-            signup_choice = input("\nDo you have an Account?\n1- Yes\n2- No\n")
+
+            signup_choice = input("\nDo you have an Account?\n" "1- Yes\n" "2- No\n")
 
             if signup_choice == "1":
                 return False
@@ -398,10 +441,11 @@ def signup_login_user(username, password, usertype):
                     return True
 
             else:
-                print("Please only choose from options!")
+                print_error("Please only choose from options.")
 
     except ValueError as e:
         print_error(e)
+        return False
 
 
 def signup_user(signup_type):
@@ -422,7 +466,7 @@ def signup_user(signup_type):
         Validator.validate_username(username)
 
         if signup_type == "customer":
-            for customer in Customer.get_customers():
+            for customer in CustomerEmployee.get_customers():
                 if customer["username"] == username:
                     raise ValueError("Username already exists.")
         elif signup_type == "seller":
@@ -568,7 +612,7 @@ def handle_customer_remove_actions(customer, method):
 def show_customer_cart_and_favorites(customer_id):
     print(colorama.Fore.BLUE)
 
-    customer = Customer.get_customer_byID(customer_id)
+    customer = CustomerEmployee.get_customer_byID(customer_id)
 
     print("\n========== CART ==========")
 
@@ -662,9 +706,13 @@ def print_account_info(user, user_type):
     print(colorama.Fore.BLUE)
     user_obj = None
     if user_type == "customer":
-        user_obj = Customer.from_dict(Customer.get_customer_byID(user.id))
+        user_obj = Customer.from_dict(CustomerEmployee.get_customer_byID(user.id))
     elif user_type == "seller":
-        user_obj = Seller.from_dict(Seller.get_seller_byID(user.id))
+        user_obj = Seller.from_dict(SellerEmployee.get_seller_byID(user.id))
+    elif user_type == "customer_employee":
+        user_obj = CustomerEmployee.from_dict(
+            CustomerManager.get_Customer_employee_byID(user.id)
+        )
     print(user_obj)
 
 
@@ -719,7 +767,7 @@ def see_seller_selling_products(seller):
     try:
         print(colorama.Fore.BLUE)
         print("\n====== Selling Products ======\n")
-        seller_json = Seller.get_seller_byID(seller.id)
+        seller_json = SellerEmployee.get_seller_byID(seller.id)
         for selling_product_id in seller_json["selling_products"]:
             product_obj = Product.from_dict(
                 Product.get_product_byID(selling_product_id)
@@ -741,16 +789,18 @@ def delete_product_from_seller(seller):
             if not product_id.isdigit():
                 print_error("Product ID must be a number.\n")
                 continue
-            
+
             product_id = int(product_id)
 
-            seller_json = Seller.get_seller_byID(seller.id)
+            seller_json = SellerEmployee.get_seller_byID(seller.id)
             if product_id not in seller_json["selling_products"]:
                 print_error("This product does not belong to you.\n")
                 continue
             else:
                 if Seller.delete_product_from_seller(seller_json, product_id):
-                    print_successful("Product was removed from your selling products successfully!\n")
+                    print_successful(
+                        "Product was removed from your selling products successfully!\n"
+                    )
                     again = input("Do you want to delete another product?\n1- Yes\n")
                     if again != "1":
                         break
@@ -771,8 +821,8 @@ def edit_product(seller):
                 continue
 
             product_id = int(product_id)
-            
-            seller_json = Seller.get_seller_byID(seller.id)
+
+            seller_json = SellerEmployee.get_seller_byID(seller.id)
             if product_id not in seller_json["selling_products"]:
                 print_error("This product does not belong to you.\n")
                 continue
@@ -824,6 +874,87 @@ def edit_product(seller):
             print_error(e)
 
 
+def remove_customer():
+    while True:
+        try:
+            show_all_users("customer")
+            customer_id = input("\nEnter Customer ID to remove (Enter 'e' to exit):\n")
+            if customer_id.lower() == "e":
+                print_successful("Exited deleting Customer!\n")
+                break
+            if not customer_id.isdigit():
+                print_error("Customer ID must be a number.\n")
+                continue
+
+            customer_id = int(customer_id)
+
+            if CustomerEmployee.delete_customer(customer_id):
+                print_successful("Customer was deleted successfully!\n")
+                again = input("Do you want to delete another customer?\n1- Yes\n")
+                if again != "1":
+                    break
+
+        except ValueError as e:
+            print_error(e)
+
+
+def show_user_tickets(all_or_unanswerd, sender_type):
+    try:
+        if all_or_unanswerd == "all":
+            user_tickets = Ticket.get_sendertype_tickets(sender_type)
+        elif all_or_unanswerd == "unanswered":
+            user_tickets = Ticket.get_unanswered_sendertype_tickets(sender_type)
+        if len(user_tickets) == 0:
+            print_successful("You have no unanswered tickets!\n")
+        else:
+            print(colorama.Fore.BLUE)
+            print(
+                f"====== {"All" if all_or_unanswerd == "all" else "Unanswered"} {sender_type}s Tickets ======\n\n"
+            )
+            for ut in user_tickets:
+                ticket_obj = Ticket.from_dict(ut)
+                print(ticket_obj, end="\n\n")
+    except ValueError as e:
+        print_error(e)
+
+
+def answer_ticket(employee_type):
+    while True:
+        try:
+            ticket_id = input("\nEnter ticket id to answer: (enter e to exit)\n")
+            if ticket_id.lower() == "e":
+                print_successful("Exited answering ticket!\n")
+                break
+
+            if not ticket_id.isdigit():
+                print_error("Customer ID must be a number.\n")
+                continue
+
+            ticket_id = int(ticket_id)
+
+            if employee_type == "customer_employee":
+                user_type = "customer"
+            else:
+                user_type = "seller"
+
+            if Ticket.check_unanswered_ticketID(ticket_id, user_type):
+                answer = input("Enter answer for the ticket:\n")
+                if employee_type == "customer_employee":
+                    answered = CustomerEmployee.answer_ticket(ticket_id, answer)
+                elif employee_type == "seller_employee":
+                    answered = SellerEmployee.answer_ticket(ticket_id, answer)
+                if answer_ticket:
+                    print_successful("Ticket was answered!\n")
+                    again = input("Answer another?\n1-Yes\n")
+                    if again != "1":
+                        break
+            else:
+                print_error("Invalid ticket ID.")
+
+        except ValueError as e:
+            print_error(e)
+
+
 # Panels -----------------------------------------------------------------
 
 
@@ -841,7 +972,7 @@ def customers_panel(customer):
             case "1":
                 customers_Shop_panel(customer)
             case "2":
-                Ticket_panel(customer, "customer")
+                user_Ticket_panel(customer, "customer")
             case "3":
                 print_account_info(customer, "customer")
             case "4":
@@ -887,7 +1018,7 @@ def customers_Shop_panel(customer):
                 print_error("Please only choose from options")
 
 
-def Ticket_panel(user, submit_type):
+def user_Ticket_panel(user, submit_type):
     while True:
         print_successful(f"Welcome {submit_type} {user.firstname} {user.lastname}!\n")
         show_ticket_menu()
@@ -915,7 +1046,7 @@ def sellers_panel(seller):
             case "1":
                 sellers_product_panel(seller)
             case "2":
-                Ticket_panel(seller, "seller")
+                user_Ticket_panel(seller, "seller")
             case "3":
                 print_account_info(seller, "seller")
             case "4":
@@ -953,8 +1084,28 @@ def sellers_product_panel(seller):
                 print_error("Please only choose from options")
 
 
-def seller_customer_panel(customer_employee):
-    pass
+def customer_employee_panel(customer_employee):
+    while True:
+        print_successful(
+            f"Welcome customer employee {customer_employee.firstname} {customer_employee.lastname}!"
+        )
+
+        show_customer_employee_menu()
+        choice = input("Please Choose:\n")
+        match choice:
+            case "1":
+                employee_Ticket_panel(
+                    customer_employee, "customer employee", "customer"
+                )
+                pass
+            case "2":
+                remove_customer()
+            case "3":
+                print_account_info(customer_employee, "customer_employee")
+            case "4":
+                break
+            case _:
+                print_error("Please only choose from options")
 
 
 def seller_employee_panel(seller_employee):
@@ -977,10 +1128,7 @@ def show_employee_manager_panel(manager, employee_type):
         match choice:
 
             case "1":
-                while True:
-                    if hire_employee(employee_type):
-                        break
-
+                hire_employee(employee_type)
             case "2":
                 fire_employee(employee_type)
 
@@ -1002,6 +1150,24 @@ def show_employee_manager_panel(manager, employee_type):
             case "8":
                 break
 
+            case _:
+                print_error("Please only choose from options")
+
+
+def employee_Ticket_panel(user, employee_type, sender_type):
+    while True:
+        print_successful(f"Welcome {employee_type} {user.firstname} {user.lastname}!\n")
+        show_user_tickets("unanswered", sender_type)
+        show_employee_Ticket_menu()
+        choice = input("Please Choose:\n")
+
+        match choice:
+            case "1":
+                answer_ticket("customer_employee")
+            case "2":
+                show_user_tickets("all", sender_type)
+            case "3":
+                break
             case _:
                 print_error("Please only choose from options")
 
@@ -1029,7 +1195,6 @@ def main():
         "9379499511",
         "Karaj_ mehrshahr",
     )
-
     while True:
         show_main_menu()
         choice = input("Please choose:\n")
@@ -1044,19 +1209,9 @@ def main():
                 case "2":
                     login = signup_login_user(username, password, "seller")
                 case "3":
-                    login, customer_employee = Person.check_login(
-                        "./Database/CustomerEmployees.json", username, password
-                    )
-                    if login:
-                        customer_employee_panel(customer_employee)
-
+                    login = signup_login_user(username, password, "customer_employee")
                 case "4":
-                    login, seller_employee = Person.check_login(
-                        "./Database/SellerEmployees.json", username, password
-                    )
-                    if login:
-                        seller_employee_panel(seller_employee)
-
+                    login = signup_login_user(username, password, "seller_employee")
                 case "5":
                     if (
                         username == customersManager.username

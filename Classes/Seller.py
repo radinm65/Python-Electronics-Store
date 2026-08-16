@@ -42,17 +42,7 @@ class Seller(User):
                 seller_unapproved_products.append(up)
         return seller_unapproved_products
 
-    @staticmethod
-    def get_sellers():
-        return FileCommands.get_file_data("./Database/Sellers.json")
 
-    @staticmethod
-    def get_seller_byID(seller_id):
-        sellers = Seller.get_sellers()
-        found_seller = next(
-            (seller for seller in sellers if seller["id"] == seller_id), None
-        )
-        return found_seller
     
     @staticmethod
     def delete_product_from_seller(seller_json, product_id):

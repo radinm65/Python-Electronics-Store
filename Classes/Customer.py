@@ -35,10 +35,6 @@ class Customer(User):
             FileCommands.add_data("./Database/Customers.json", new_customer)
 
 
-    @staticmethod
-    def get_customers():
-        return FileCommands.get_file_data("./Database/Customers.json")
-
 
     def add_to_cart(self, product_id):
         product = Product.get_product_byID(product_id)
@@ -150,13 +146,6 @@ class Customer(User):
                 )
         return False
     
-    @staticmethod
-    def get_customer_byID(customer_id):
-        customers = Customer.get_customers()
-        found_customer = next(
-            (customer for customer in customers if customer["id"] == customer_id), None
-        )
-        return found_customer
     
     @staticmethod
     def add_cart_to_favorites(customer_id):
@@ -238,3 +227,5 @@ class Customer(User):
             f"Favorites: {self.favorites}\n"
             f"Bought: {self.bought}\n"
         )
+
+    

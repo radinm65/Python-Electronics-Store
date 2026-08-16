@@ -70,6 +70,24 @@ class Ticket:
                 user_tickets.append(ticket)
         return user_tickets
     
+    @staticmethod    
+    def get_unanswered_sendertype_tickets(sender_type):
+        unanswered_tickets = []
+        all_tickets = Ticket.get_all_tickets()
+        for ticket in all_tickets:
+            if ticket["sender_type"] == sender_type and ticket["response"] == "":
+                unanswered_tickets.append(ticket)
+        return unanswered_tickets
+    
+    @staticmethod
+    def check_unanswered_ticketID(ticketID, sender_type):
+        unanswered_tickets = Ticket.get_unanswered_sendertype_tickets(sender_type)
+        for ut in unanswered_tickets:
+            if ticketID == ut["id"]:
+                return True
+        return False
+            
+    
     @staticmethod
     def get_user_tickets(user_id, sender_type):
         user_tickets = []

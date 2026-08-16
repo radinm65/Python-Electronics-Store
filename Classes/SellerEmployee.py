@@ -1,4 +1,5 @@
 from Classes.Employee import Employee
+from Classes.Ticket import Ticket
 from FileCommands import FileCommands
 from IDGenerator import seller_employee_id_generator
 
@@ -14,7 +15,6 @@ class SellerEmployee(Employee):
         phone_num,
         address,
         bank_account,
-        date_hired,
         salary,
     ):
         super().__init__(
@@ -26,7 +26,6 @@ class SellerEmployee(Employee):
             phone_num,
             address,
             bank_account,
-            date_hired,
             salary,
         )
         self.id = seller_employee_id_generator.next_id()
@@ -61,18 +60,65 @@ class SellerEmployee(Employee):
         unapproved_products = SellerEmployee.get_unapproved_products()
         for up in unapproved_products:
             if up["id"] == product_id:
-                FileCommands.delete_data("./Database/UnapprovedProducts.json", product_id)
+                FileCommands.delete_data(
+                    "./Database/UnapprovedProducts.json", product_id
+                )
                 return FileCommands.add_data("./Database/Products.json", up)
         return False
 
     @staticmethod
     def answer_ticket(ticket_id, answer):
-        tickets = FileCommands.get_file_data("./Database/SellerTickets.json")
-        for ticket in tickets:
+        seller_tickets = Ticket.get_sendertype_tickets("seller")
+        for ticket in seller_tickets:
             if ticket["id"] == ticket_id:
                 if ticket["response"] == "":
                     ticket["response"] = answer
-                    return FileCommands.save_file_data("./Database/SellerTickets.json", tickets)
+                    return FileCommands.edit_data("./Database/Tickets.json", ticket)
                 else:
                     raise ValueError("Ticket already has a response")
         return False
+
+    @staticmethod
+    def get_sellers():
+        return FileCommands.get_file_data("./Database/Sellers.json")
+
+    @staticmethod
+    def get_seller_byID(seller_id):
+        sellers = SellerEmployee.get_sellers()
+        found_seller = next(
+            (seller for seller in sellers if seller["id"] == seller_id), None
+        )
+        return found_seller
+
+    @classmethod
+    def from_dict(cls, data):
+        seller_employee = cls(
+            data["firstname"],
+            data["lastname"],
+            data["username"],
+            "Temp123!45",
+            str(data["age"]),
+            data["phone_num"],
+            data["address"],
+            data["bank_account_num"],
+            data["salary"],
+        )
+        seller_employee.set_hashed_password(data["password"])
+        seller_employee.id = data["id"]
+        seller_employee.date_hired = data["date_hired"]
+
+        return seller_employee
+
+
+    def __str__(self):
+        return (
+            f"Firstname: {self.firstname}\n"
+            f"Lastname: {self.lastname}\n"
+            f"Username: {self.username}\n"
+            f"Age: {self.age}\n"
+            f"Phone_num: {self.phone_num}\n"
+            f"Address: {self.address}\n"
+            f"Bank_account_num: {self.bank_account_num}\n"
+            f"Salary: {self.salary}\n"
+            f"Date_hired: {self.date_hired}\n"
+        )

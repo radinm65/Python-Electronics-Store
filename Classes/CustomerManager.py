@@ -68,6 +68,15 @@ class CustomerManager(Manager):
     @staticmethod
     def get_customer_employees():
         return FileCommands.get_file_data("./Database/CustomerEmployees.json")
+    
+    @staticmethod
+    def get_Customer_employee_byID(customer_employee_id):
+        customer_employees = CustomerManager.get_customer_employees()
+        found_ce = next(
+            (ce for ce in customer_employees if ce["id"] == customer_employee_id), None
+        )
+        return found_ce
+
 
     @staticmethod
     def save_customer_employees(customer_employees):

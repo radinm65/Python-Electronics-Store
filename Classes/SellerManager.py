@@ -13,9 +13,9 @@ class SellerManager(Manager):
         )
 
     def raise_salary(seller_employee_id, amount):
-        
+
         Validator.validate_raise_amount(amount)
-        
+
         seller_employees = SellerManager.get_seller_employees()
         for se in seller_employees:
             if se["id"] == seller_employee_id:
@@ -44,7 +44,7 @@ class SellerManager(Manager):
             phone_num,
             address,
             bank_account_num,
-            salary
+            salary,
         )
         json_employee = {
             "id": new_employee.id,
@@ -57,22 +57,34 @@ class SellerManager(Manager):
             "address": new_employee.address,
             "bank_account_num": new_employee.bank_account_num,
             "date_hired": new_employee.date_hired.isoformat(),
-            "salary": new_employee.salary
+            "salary": new_employee.salary,
         }
         return FileCommands.add_data("./Database/SellerEmployees.json", json_employee)
 
     @staticmethod
     def fire_employee(seller_employee_id):
-        return FileCommands.delete_data("./Database/SellerEmployees.json", seller_employee_id)
+        return FileCommands.delete_data(
+            "./Database/SellerEmployees.json", seller_employee_id
+        )
 
     @staticmethod
     def get_seller_employees():
         return FileCommands.get_file_data("./Database/SellerEmployees.json")
 
     @staticmethod
+    def get_seller_employee_byID(seller_employee_id):
+        seller_employees = SellerManager.get_seller_employees()
+        found_se = next(
+            (se for se in seller_employees if se["id"] == seller_employee_id), None
+        )
+        return found_se
+
+    @staticmethod
     def save_seller_employees(seller_employees):
-        return FileCommands.save_file_data("./Database/SellerEmployees.json", seller_employees)
-    
+        return FileCommands.save_file_data(
+            "./Database/SellerEmployees.json", seller_employees
+        )
+
     @staticmethod
     def check_employee_byID(emp_id):
         seller_employees = SellerManager.get_seller_employees()

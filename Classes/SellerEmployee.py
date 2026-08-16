@@ -44,6 +44,8 @@ class SellerEmployee(Employee):
 
     @staticmethod
     def approve_seller(seller_id):
+        if not SellerEmployee.check_unapproved_sellerID(seller_id):
+            raise ValueError("ID not found.\n")
         unapproved_sellers = SellerEmployee.get_unapproved_sellers()
         for us in unapproved_sellers:
             if us["id"] == seller_id:
@@ -52,20 +54,43 @@ class SellerEmployee(Employee):
         return False
 
     @staticmethod
-    def remove_seller(seller_id):
-        return FileCommands.delete_data("./Database/Sellers.json", seller_id)
-
-    @staticmethod
     def approve_product(product_id):
+        if not SellerEmployee.check_unapproved_productID(product_id):
+            raise ValueError("ID not found.\n")
         unapproved_products = SellerEmployee.get_unapproved_products()
         for up in unapproved_products:
             if up["id"] == product_id:
                 FileCommands.delete_data(
                     "./Database/UnapprovedProducts.json", product_id
                 )
-                return FileCommands.add_data("./Database/Products.json", up)
+                return FileCommands.add_data("./Database/ApprovedProducts.json", up)
         return False
 
+    @staticmethod
+    def check_unapproved_sellerID(sellerID):
+        unapproved_sellers = SellerEmployee.get_unapproved_sellers()
+        for us in unapproved_sellers:
+            if sellerID == us["id"]:
+                return True
+        return False
+
+    @staticmethod
+    def check_unapproved_productID(productID):
+        unapproved_products = SellerEmployee.get_unapproved_products()
+        for up in unapproved_products:
+            if productID == up["id"]:
+                return True
+        return False
+
+    @staticmethod
+    def remove_seller(seller_id):
+        return FileCommands.delete_data("./Database/Sellers.json", seller_id)
+
+    @staticmethod
+    def remove_product(product_id):
+        return FileCommands.delete_data("./Database/ApprovedProducts.json", product_id)
+    
+    
     @staticmethod
     def answer_ticket(ticket_id, answer):
         seller_tickets = Ticket.get_sendertype_tickets("seller")
@@ -108,7 +133,6 @@ class SellerEmployee(Employee):
         seller_employee.date_hired = data["date_hired"]
 
         return seller_employee
-
 
     def __str__(self):
         return (

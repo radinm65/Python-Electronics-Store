@@ -51,14 +51,15 @@ def show_customer_shop_menu():
     print(colorama.Fore.YELLOW)
     print(
         "1- Checkout\n"
-        "2- Add to Cart\n"
-        "3- Add To Favorites\n"
-        "4- Add Favorites To cart\n"
-        "5- Delete From Cart\n"
-        "6- Delete From Favorites\n"
-        "7- See Cart and Favorites\n"
-        "8- Add to balance\n"
-        "9- Back\n",
+        "2- Filter products\n"
+        "3- Add to Cart\n"
+        "4- Add To Favorites\n"
+        "5- Add Favorites To cart\n"
+        "6- Delete From Cart\n"
+        "7- Delete From Favorites\n"
+        "8- See Cart and Favorites\n"
+        "9- Add to balance\n"
+        "10- Back\n",
         colorama.Fore.WHITE,
     )
 
@@ -144,9 +145,10 @@ def show_customer_employee_manager_menu():
         "3- Give Raise\n"
         "4- See All Customer Employees\n"
         "5- See All Customers\n"
-        "6- Get top 5 Customers .xlsx Report\n"
-        "7- See Account Info\n"
-        "8- Back\n",
+        "6- Get top 3 Customers .xlsx Report\n"
+        "7- Get customers CSV or TXT report\n"
+        "8- See Account Info\n"
+        "9- Back\n",
         colorama.Fore.WHITE,
     )
 
@@ -159,9 +161,10 @@ def show_seller_employee_manager_menu():
         "3- Give Raise\n"
         "4- See All seller Employees\n"
         "5- See All sellers\n"
-        "6- Get top 5 sellers .xlsx Report\n"
-        "7- See Account Info\n"
-        "8- Back\n",
+        "6- Get top 3 sellers .xlsx Report\n"
+        "7- Get sellers CSV or TXT report\n"
+        "8- See Account Info\n"
+        "9- Back\n",
         colorama.Fore.WHITE,
     )
 
@@ -1065,7 +1068,173 @@ def show_all_products():
     for product in all_products:
         print(Product.from_dict(product), end="\n--------------------\n")
         
+        
+@staticmethod
+def filter_products():
 
+    products = Product.get_approved_products()
+
+    while True:
+        try:
+            print(
+                "\nFilter By:\n"
+                "1- Name\n"
+                "2- Brand\n"
+                "3- Category\n"
+                "4- Price\n"
+                "5- Exit"
+            )
+
+            choice = input("Please choose:\n")
+
+            match choice:
+                case "1":
+                    name = input("Enter product name:\n")
+
+                    filtered_products = list(
+                        filter(
+                            lambda product: name.lower() in product["name"].lower(),
+                            products
+                        )
+                    )
+
+                case "2":
+                    brand = input("Enter brand:\n")
+
+                    filtered_products = list(
+                        filter(
+                            lambda product: brand.lower() in product["brand"].lower(),
+                            products
+                        )
+                    )
+
+                case "3":
+                    category = input("Enter category:\n")
+
+                    filtered_products = list(
+                        filter(
+                            lambda product: category.lower() == product["category"].lower(),
+                            products
+                        )
+                    )
+
+                case "4":
+                    min_price = int(input("Enter minimum price:\n"))
+                    max_price = int(input("Enter maximum price:\n"))
+
+                    filtered_products = list(
+                        filter(
+                            lambda product:
+                            min_price <= product["price"] <= max_price,
+                            products
+                        )
+                    )
+
+                case "5":
+                    break
+
+                case _:
+                    raise ValueError("Please only choose from options.\n")
+
+            if not filtered_products:
+                print_error("\nNo products found.\n")
+                continue
+
+            for product in filtered_products:
+                print(colorama.Fore.BLUE)
+                print(Product.from_dict(product), end="\n-------------------------\n")
+                print(colorama.Fore.WHITE)
+
+        except ValueError as e:
+            print_error(e)
+            
+            
+import csv
+
+
+@staticmethod
+def export_customer_or_seller(employee_type):
+
+    data = {
+        "customer": {
+            "file": CustomerEmployee.get_customers,
+            "name": "Customers"
+        },
+        "seller": {
+            "file": SellerEmployee.get_sellers,
+            "name": "Sellers"
+        }
+    }
+
+    if employee_type not in data:
+        raise ValueError("Invalid employee type.")
+
+    user_data = data[employee_type]
+
+    users = user_data["file"]()
+
+    if not users:
+        raise ValueError(f"No {employee_type}s found.")
+
+    while True:
+        try:
+            print(
+                "\nExport As:\n"
+                "1- CSV\n"
+                "2- TXT\n"
+                "3- Exit"
+            )
+
+            choice = input("Please choose:\n")
+
+            if choice == "1":
+
+                filename = f"./Reports/{user_data['name']}.csv"
+
+                fieldnames = users[0].keys()
+
+                with open(filename, "w", newline="", encoding="utf-8") as file:
+                    writer = csv.DictWriter(
+                        file,
+                        fieldnames=fieldnames
+                    )
+
+                    writer.writeheader()
+                    writer.writerows(users)
+
+                print_successful(
+                    f"{user_data['name']} exported successfully to CSV."
+                )
+
+                return True
+
+            elif choice == "2":
+
+                filename = f"./Reports/{user_data['name']}.txt"
+
+                with open(filename, "w", encoding="utf-8") as file:
+
+                    for user in users:
+
+                        for key, value in user.items():
+                            file.write(f"{key}: {value}\n")
+
+                        file.write("\n")
+
+                print_successful(
+                    f"{user_data['name']} exported successfully to TXT."
+                )
+
+                return True
+
+            elif choice == "3":
+                return False
+
+            else:
+                print_error("Please only choose from options.")
+
+        except ValueError as e:
+            print_error(e)
 
 # Panels -----------------------------------------------------------------
 
@@ -1111,20 +1280,22 @@ def customers_Shop_panel(customer):
                 except ValueError as e:
                     print_error(e)
             case "2":
-                handle_customer_add_actions(customer, "cart")
+                filter_products()
             case "3":
-                handle_customer_add_actions(customer, "favorites")
+                handle_customer_add_actions(customer, "cart")
             case "4":
-                add_cart_to_favorites(customer)
+                handle_customer_add_actions(customer, "favorites")
             case "5":
-                handle_customer_remove_actions(customer, "cart")
+                add_cart_to_favorites(customer)
             case "6":
-                handle_customer_remove_actions(customer, "favorites")
+                handle_customer_remove_actions(customer, "cart")
             case "7":
-                show_customer_cart_and_favorites(customer.id)
+                handle_customer_remove_actions(customer, "favorites")
             case "8":
-                add_to_balance(customer)
+                show_customer_cart_and_favorites(customer.id)
             case "9":
+                add_to_balance(customer)
+            case "10":
                 break
             case _:
                 print_error("Please only choose from options")
@@ -1319,9 +1490,12 @@ def show_employee_manager_panel(manager, employee_type):
                 generate_top3_report(employee_type)
 
             case "7":
+                export_customer_or_seller(employee_type)
+                
+            case "8":
                 show_manager_account_info(manager)
 
-            case "8":
+            case "9":
                 break
 
             case _:

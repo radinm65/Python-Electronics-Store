@@ -35,12 +35,12 @@ class FileCommands:
 
         data_id = int(data_id)
 
-        if not any(data["id"] == data_id for data in datas):
-            raise ValueError("ID not found.")
+        for i, data in enumerate(datas):
+            if data["id"] == data_id:
+                del datas[i]
+                return FileCommands.save_file_data(path, datas)
 
-        datas = [data for data in datas if data["id"] != data_id]
-
-        return FileCommands.save_file_data(path, datas)
+        raise ValueError("ID not found.")
     
     
     @staticmethod

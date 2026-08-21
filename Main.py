@@ -7,6 +7,9 @@ from Classes.Seller import Seller
 from Classes.CustomerEmployee import CustomerEmployee
 from Classes.SellerEmployee import SellerEmployee
 from Classes.Product import Product
+from Classes.Phone import Phone
+from Classes.Laptop import Laptop
+from Classes.Camera import Camera
 from Classes.Ticket import Ticket
 from Report import Report
 
@@ -511,11 +514,16 @@ def signup_user(signup_type):
 
 def show_products():
     try:
-        products = Product.get_approved_products()
+        phones = Phone.get_approved_products()
+        laptops = Laptop.get_approved_products()
+        cameras = Camera.get_approved_products()
         print(colorama.Fore.BLUE)
-        for product in products:
-            product_obj = Product.from_dict(product)
-            print(product_obj)
+        for phone in phones:
+            print(Phone.from_dict(phone))
+        for laptop in laptops:
+            print(Laptop.from_dict(laptop))
+        for camera in cameras:
+            print(Camera.from_dict(camera))
         print(colorama.Fore.WHITE)
 
     except ValueError as e:
@@ -716,20 +724,31 @@ def make_product(seller):
     while True:
         try:
             print_error("Enter e on first input to exit.\n")
-            name = input("Enter name of product:\n")
+            category_choice = input(
+                "Choose product category:\n1- Phone\n2- Laptop\n3- Camera\n"
+            )
 
-            if name == "e":
+            if category_choice == "e":
                 print_successful("Exited registering product!\n")
                 break
 
-            new_product = Product(seller.id)
-            new_product.name = name
+            if category_choice == "1":
+                new_product = Phone(seller.id)
+            elif category_choice == "2":
+                new_product = Laptop(seller.id)
+            elif category_choice == "3":
+                new_product = Camera(seller.id)
+            else:
+                print_error("Please only choose from options.")
+                continue
+
+            new_product.name = input("\nEnter name of product:\n")
 
             new_product.brand = input("\nEnter brand:\n")
 
             new_product.price = input("\nEnter price:\n")
 
-            new_product.category = input("\nEnter category: (Phone, Laptop, Camera)\n")
+            new_product.input_extra_fields()
 
             new_product.save()
 
@@ -750,7 +769,12 @@ def see_seller_unapproved_products(seller):
         print("\n====== Unapproved Products ======\n")
         unapproved_products = seller.get_seller_unapproved_products()
         for up in unapproved_products:
-            product_obj = Product.from_dict(up)
+            if "battery_mah" in up:
+                product_obj = Phone.from_dict(up)
+            elif "cpu" in up:
+                product_obj = Laptop.from_dict(up)
+            elif "sensor_type" in up:
+                product_obj = Camera.from_dict(up)
             print(product_obj, end="\n\n")
     except ValueError as e:
         print_error(e)
@@ -762,9 +786,13 @@ def see_seller_selling_products(seller):
         print("\n====== Selling Products ======\n")
         seller_json = SellerEmployee.get_seller_byID(seller.id)
         for selling_product_id in seller_json["selling_products"]:
-            product_obj = Product.from_dict(
-                Product.get_product_byID(selling_product_id)
-            )
+            product_data = Product.get_product_byID(selling_product_id)
+            if "battery_mah" in product_data:
+                product_obj = Phone.from_dict(product_data)
+            elif "cpu" in product_data:
+                product_obj = Laptop.from_dict(product_data)
+            elif "sensor_type" in product_data:
+                product_obj = Camera.from_dict(product_data)
             print(product_obj, end="\n\n")
     except ValueError as e:
         print_error(e)
@@ -820,25 +848,25 @@ def edit_product(seller=None):
                 if product_id not in seller_json["selling_products"]:
                     print_error("This product does not belong to you.\n")
                     continue
-            else:
-                approved_products = Product.get_approved_products()
-                found = False
-                for ap in approved_products:
-                    if ap["id"] == product_id:
-                        found = True
-                if not found:
-                    print_error("Invalid ID.")
-                    continue
 
             product_data = Product.get_product_byID(product_id)
-            product = Product.from_dict(product_data)
+            if product_data is None:
+                print_error("Invalid ID.")
+                continue
+
+            if "battery_mah" in product_data:
+                product = Phone.from_dict(product_data)
+            elif "cpu" in product_data:
+                product = Laptop.from_dict(product_data)
+            elif "sensor_type" in product_data:
+                product = Camera.from_dict(product_data)
 
             print(
                 "\nWhich field do you want to edit?\n"
                 "1- Name\n"
                 "2- Brand\n"
                 "3- Price\n"
-                "4- Category\n"
+                "4- Type-Specific Field\n"
             )
 
             choice = input("Enter your choice:\n")
@@ -854,7 +882,7 @@ def edit_product(seller=None):
                     product.price = input("Enter new price:\n")
 
                 case "4":
-                    product.category = input("Enter new category:\n")
+                    product.edit_extra_field()
 
                 case _:
                     print_error("Invalid choice.\n")
@@ -869,8 +897,16 @@ def edit_product(seller=None):
                 "seller_id": product.seller_id,
                 "date_created": product_data["date_created"],
             }
+            edited_product.update(product.extra_fields())
 
-            if Product.edit_product(edited_product):
+            if type(product) == Phone:
+                edited = Phone.edit_product(edited_product)
+            elif type(product) == Laptop:
+                edited = Laptop.edit_product(edited_product)
+            elif type(product) == Camera:
+                edited = Camera.edit_product(edited_product)
+
+            if edited:
                 print_successful("Product was edited successfully!\n")
                 again = input("Do you want to edit another product?\n1- Yes\n")
                 if again != "1":
@@ -975,7 +1011,12 @@ def show_unapproved_products():
     print(colorama.Fore.BLUE)
     print("======= Unapproved products ========")
     for up in unapproved_products:
-        product_obj = Product.from_dict(up)
+        if "battery_mah" in up:
+            product_obj = Phone.from_dict(up)
+        elif "cpu" in up:
+            product_obj = Laptop.from_dict(up)
+        elif "sensor_type" in up:
+            product_obj = Camera.from_dict(up)
         print(product_obj, end="\n---------------------\n")
 
 
@@ -997,7 +1038,7 @@ def approve_product_or_seller(product_or_seller):
             if approved:
                 print_successful(f"{product_or_seller} was approved successfuly!\n")
                 again = input("Approve another?\n1- Yes\n")
-                if again != 1:
+                if again != "1":
                     break
         except ValueError as e:
             print_error(e)
@@ -1017,24 +1058,34 @@ def remove_seller_or_product(product_or_seller):
             if removed:
                 print_successful(f"{product_or_seller} was removed successfuly!\n")
                 again = input("Remove another?\n1- Yes\n")
-                if again != 1:
+                if again != "1":
                     break
         except ValueError as e:
             print_error(e, end="\n\n")
 
 
 def show_all_products():
-    all_products = Product.get_approved_products()
+    phones = Phone.get_approved_products()
+    laptops = Laptop.get_approved_products()
+    cameras = Camera.get_approved_products()
     print(colorama.Fore.BLUE)
     print("\n======= All products =======\n")
-    for product in all_products:
-        print(Product.from_dict(product), end="\n--------------------\n")
+    for phone in phones:
+        print(Phone.from_dict(phone), end="\n--------------------\n")
+    for laptop in laptops:
+        print(Laptop.from_dict(laptop), end="\n--------------------\n")
+    for camera in cameras:
+        print(Camera.from_dict(camera), end="\n--------------------\n")
 
 
 @staticmethod
 def filter_products():
 
-    products = Product.get_approved_products()
+    products = (
+        Phone.get_approved_products()
+        + Laptop.get_approved_products()
+        + Camera.get_approved_products()
+    )
 
     while True:
         try:
@@ -1104,7 +1155,13 @@ def filter_products():
 
             for product in filtered_products:
                 print(colorama.Fore.BLUE)
-                print(Product.from_dict(product), end="\n-------------------------\n")
+                if "battery_mah" in product:
+                    product_obj = Phone.from_dict(product)
+                elif "cpu" in product:
+                    product_obj = Laptop.from_dict(product)
+                elif "sensor_type" in product:
+                    product_obj = Camera.from_dict(product)
+                print(product_obj, end="\n-------------------------\n")
                 print(colorama.Fore.WHITE)
 
         except ValueError as e:

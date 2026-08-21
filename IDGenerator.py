@@ -29,8 +29,12 @@ class IDGenerator:
 
 ticket_id_generator = IDGenerator("./Database/Tickets.json")
 
+# Shared across Phone/Laptop/Camera so all product categories draw from one
+# unified id sequence and can never collide with each other.
 product_id_generator = IDGenerator([
-    "./Database/ApprovedProducts.json",
+    "./Database/ApprovedPhones.json",
+    "./Database/ApprovedLaptops.json",
+    "./Database/ApprovedCameras.json",
     "./Database/UnapprovedProducts.json"
 ])
 

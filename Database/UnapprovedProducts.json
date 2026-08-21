@@ -6,7 +6,10 @@
         "price": 29000,
         "category": "Phone",
         "seller_id": 1,
-        "date_created": "2026-08-01T11:00:00"
+        "date_created": "2026-08-01T11:00:00",
+        "ram_gb": 8,
+        "storage_gb": 128,
+        "battery_mah": 4500
     },
     {
         "id": 7,
@@ -15,7 +18,10 @@
         "price": 75000,
         "category": "Laptop",
         "seller_id": 2,
-        "date_created": "2026-08-02T15:30:00"
+        "date_created": "2026-08-02T15:30:00",
+        "ram_gb": 16,
+        "storage_gb": 512,
+        "cpu": "Apple M2"
     },
     {
         "id": 8,
@@ -24,7 +30,10 @@
         "price": 46000,
         "category": "Camera",
         "seller_id": 3,
-        "date_created": "2026-08-03T13:40:00"
+        "date_created": "2026-08-03T13:40:00",
+        "resolution_mp": 20.0,
+        "zoom_factor": 3.0,
+        "sensor_type": "CMOS"
     },
     {
         "id": 9,
@@ -33,7 +42,10 @@
         "price": 68000,
         "category": "Laptop",
         "seller_id": 4,
-        "date_created": "2026-08-04T18:00:00"
+        "date_created": "2026-08-04T18:00:00",
+        "ram_gb": 8,
+        "storage_gb": 256,
+        "cpu": "Intel Core i5"
     },
     {
         "id": 10,
@@ -42,7 +54,10 @@
         "price": 37000,
         "category": "Camera",
         "seller_id": 5,
-        "date_created": "2026-08-05T19:25:00"
+        "date_created": "2026-08-05T19:25:00",
+        "resolution_mp": 16.0,
+        "zoom_factor": 10.0,
+        "sensor_type": "CCD"
     },
     {
         "id": 11,
@@ -51,6 +66,9 @@
         "price": "350",
         "category": "Phone",
         "seller_id": 1,
-        "date_created": "2026-08-13T16:38:53.956450"
+        "date_created": "2026-08-13T16:38:53.956450",
+        "ram_gb": 6,
+        "storage_gb": 128,
+        "battery_mah": 3200
     }
 ]

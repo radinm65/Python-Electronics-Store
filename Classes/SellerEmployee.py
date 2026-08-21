@@ -1,5 +1,8 @@
 from Classes.Employee import Employee
 from Classes.Ticket import Ticket
+from Classes.Phone import Phone
+from Classes.Laptop import Laptop
+from Classes.Camera import Camera
 from FileCommands import FileCommands
 from IDGenerator import seller_employee_id_generator
 
@@ -34,15 +37,20 @@ class SellerEmployee(Employee):
 
     @staticmethod
     def approve_product(product_id):
-        if not SellerEmployee.check_unapproved_productID(product_id):
-            raise ValueError("ID not found.\n")
         unapproved_products = SellerEmployee.get_unapproved_products()
-        for up in unapproved_products:
-            if up["id"] == product_id:
-                FileCommands.delete_data(
-                    "./Database/UnapprovedProducts.json", product_id
-                )
-                return FileCommands.add_data("./Database/ApprovedProducts.json", up)
+        found = next((up for up in unapproved_products if up["id"] == product_id), None)
+
+        if found is None:
+            raise ValueError("ID not found.\n")
+
+        FileCommands.delete_data("./Database/UnapprovedProducts.json", product_id)
+
+        if "battery_mah" in found:
+            return FileCommands.add_data("./Database/ApprovedPhones.json", found)
+        elif "cpu" in found:
+            return FileCommands.add_data("./Database/ApprovedLaptops.json", found)
+        elif "sensor_type" in found:
+            return FileCommands.add_data("./Database/ApprovedCameras.json", found)
         return False
 
     @staticmethod
@@ -54,20 +62,20 @@ class SellerEmployee(Employee):
         return False
 
     @staticmethod
-    def check_unapproved_productID(productID):
-        unapproved_products = SellerEmployee.get_unapproved_products()
-        for up in unapproved_products:
-            if productID == up["id"]:
-                return True
-        return False
-
-    @staticmethod
     def remove_seller(seller_id):
         return FileCommands.delete_data("./Database/Sellers.json", seller_id)
 
     @staticmethod
     def remove_product(product_id):
-        return FileCommands.delete_data("./Database/ApprovedProducts.json", product_id)
+        try:
+            return Phone.remove_product(product_id)
+        except ValueError:
+            pass
+        try:
+            return Laptop.remove_product(product_id)
+        except ValueError:
+            pass
+        return Camera.remove_product(product_id)
 
 
     @staticmethod

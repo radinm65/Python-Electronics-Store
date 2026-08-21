@@ -142,7 +142,8 @@
             2,
             5
         ],
-        "favorites": [],
+        "favorites": [
+        ],
         "bought": [
             {
                 "product_id": 4,

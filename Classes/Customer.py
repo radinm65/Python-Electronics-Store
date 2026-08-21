@@ -39,7 +39,7 @@ class Customer(User):
         if product is None:
             raise ValueError("Product not found.")
 
-        customers = Customer.get_customers()
+        customers = CustomerEmployee.get_customers()
 
         for customer in customers:
             if customer["id"] == self.id:
@@ -60,7 +60,7 @@ class Customer(User):
         if product is None:
             raise ValueError("Product not found.")
 
-        customers = Customer.get_customers()
+        customers = CustomerEmployee.get_customers()
         for customer in customers:
             if customer["id"] == self.id:
 
@@ -74,7 +74,7 @@ class Customer(User):
         return False
 
     def remove_from_favorites(self, product_id):
-        customers = Customer.get_customers()
+        customers = CustomerEmployee.get_customers()
 
         for customer in customers:
             if customer["id"] == self.id:
@@ -89,7 +89,7 @@ class Customer(User):
         return False
 
     def remove_from_cart(self, product_id):
-        customers = Customer.get_customers()
+        customers = CustomerEmployee.get_customers()
 
         for customer in customers:
             if customer["id"] == self.id:
@@ -104,7 +104,7 @@ class Customer(User):
         return False
 
     def checkout(self):
-        customers = Customer.get_customers()
+        customers = CustomerEmployee.get_customers()
         for customer in customers:
             if customer["id"] == self.id:
                 if len(customer["cart"]) == 0:
@@ -112,17 +112,19 @@ class Customer(User):
                 sellers = FileCommands.get_file_data("./Database/Sellers.json")
                 purchase_date = datetime.today().isoformat()
                 total_price = 0
-                # اول چک موجودی
+                # اول چک موجودی (آیتم‌های حذف‌شده/نامعتبر نادیده گرفته می‌شوند)
                 for product_id in customer["cart"]:
                     product = Product.get_product_byID(product_id)
                     if product is None:
-                        raise ValueError("Product not found.")
+                        continue
                     total_price += product["price"]
                 if total_price > customer["balance"]:
                     raise ValueError("Not enough balance.")
                 # خرید انجام شود
                 for product_id in customer["cart"]:
                     product = Product.get_product_byID(product_id)
+                    if product is None:
+                        continue
                     customer["bought"].append(
                         {"product_id": product_id, "date": purchase_date}
                     )
@@ -147,7 +149,7 @@ class Customer(User):
     @staticmethod
     def add_cart_to_favorites(customer_id):
 
-        customers = Customer.get_customers()
+        customers = CustomerEmployee.get_customers()
 
         for customer in customers:
 
@@ -173,7 +175,7 @@ class Customer(User):
     @staticmethod
     def add_to_balance(customer_id, new_balance):
 
-        customers = Customer.get_customers()
+        customers = CustomerEmployee.get_customers()
 
         for customer in customers:
 

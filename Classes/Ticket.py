@@ -1,30 +1,15 @@
 from datetime import datetime
 from IDGenerator import ticket_id_generator
 from FileCommands import FileCommands
-from Validator import Validator
 
 
 class Ticket:
 
-    def __init__(self, from_name, from_id, request, sender_type, save, response=""):
+    def __init__(self, from_id):
         self.id = ticket_id_generator.next_id()
-        self.from_name = from_name
         self.from_id = from_id
-        self.request = request
-        self.response = response
-        self.sender_type = sender_type
+        self.response = ""
         self.__date_created = datetime.today()
-        if save:
-            new_ticket = {
-                "id": self.id,
-                "from_name": self.from_name,
-                "from_id": self.from_id,
-                "request": self.request,
-                "response": self.response,
-                "sender_type": self.sender_type,
-                "date_created": self.date_created.isoformat(),
-            }
-            FileCommands.add_data("./Database/Tickets.json", new_ticket)
 
     @property
     def request(self):
@@ -32,7 +17,15 @@ class Ticket:
 
     @request.setter
     def request(self, new_request):
-        Validator.validate_ticket_request(new_request)
+        if len(new_request) > 200:
+            raise ValueError(
+                "Ticket request must be under 200 characters."
+            )
+
+        if len(new_request) < 10:
+            raise ValueError(
+                "Ticket request must be at least 10 characters."
+            )
         self.__request = new_request
 
     @property
@@ -41,27 +34,50 @@ class Ticket:
 
     @from_name.setter
     def from_name(self, new_from_name):
-        Validator.validate_name(new_from_name)
+        if len(new_from_name) < 3:
+            raise ValueError(
+                "Name must be at least 3 characters."
+            )
+
+        if any(char.isdigit() for char in new_from_name):
+            raise ValueError(
+                "Name shouldn't have numbers."
+            )
         self.__from_name = new_from_name
 
     @property
     def date_created(self):
         return self.__date_created
-    
+
     @property
     def sender_type(self):
         return self.__sender_type
 
     @sender_type.setter
     def sender_type(self, new_type):
-        Validator.validate_sender_type(new_type)
+        if new_type not in ("customer", "seller"):
+            raise ValueError(
+                "Sender type must be customer or seller."
+            )
         self.__sender_type = new_type
-        
-    @staticmethod    
+
+    def save(self):
+        new_ticket = {
+            "id": self.id,
+            "from_name": self.from_name,
+            "from_id": self.from_id,
+            "request": self.request,
+            "response": self.response,
+            "sender_type": self.sender_type,
+            "date_created": self.date_created.isoformat(),
+        }
+        return FileCommands.add_data("./Database/Tickets.json", new_ticket)
+
+    @staticmethod
     def get_all_tickets():
         return FileCommands.get_file_data("./Database/Tickets.json")
-    
-    @staticmethod    
+
+    @staticmethod
     def get_sendertype_tickets(sender_type):
         user_tickets = []
         all_tickets = Ticket.get_all_tickets()
@@ -69,8 +85,8 @@ class Ticket:
             if ticket["sender_type"] == sender_type:
                 user_tickets.append(ticket)
         return user_tickets
-    
-    @staticmethod    
+
+    @staticmethod
     def get_unanswered_sendertype_tickets(sender_type):
         unanswered_tickets = []
         all_tickets = Ticket.get_all_tickets()
@@ -78,7 +94,7 @@ class Ticket:
             if ticket["sender_type"] == sender_type and ticket["response"] == "":
                 unanswered_tickets.append(ticket)
         return unanswered_tickets
-    
+
     @staticmethod
     def check_unanswered_ticketID(ticketID, sender_type):
         unanswered_tickets = Ticket.get_unanswered_sendertype_tickets(sender_type)
@@ -86,16 +102,15 @@ class Ticket:
             if ticketID == ut["id"]:
                 return True
         return False
-            
-    
+
     @staticmethod
     def get_user_tickets(user_id, sender_type):
         user_tickets = []
         if sender_type == "customer":
             tickets = Ticket.get_sendertype_tickets("customer")
-        else: 
+        else:
             tickets = Ticket.get_sendertype_tickets("seller")
-                
+
         for ticket in tickets:
             if ticket["from_id"] == user_id:
                 user_tickets.append(ticket)
@@ -103,19 +118,15 @@ class Ticket:
 
     @staticmethod
     def from_dict(ticket_dict):
-        ticket =  Ticket(
-            from_name=ticket_dict["from_name"],
-            from_id=ticket_dict["from_id"],
-            request=ticket_dict["request"],
-            sender_type=ticket_dict["sender_type"],
-            save=False,
-            response=ticket_dict.get("response", "")
-        )
+        ticket = Ticket(ticket_dict["from_id"])
         ticket.id = ticket_dict["id"]
-        
+        ticket.from_name = ticket_dict["from_name"]
+        ticket.request = ticket_dict["request"]
+        ticket.sender_type = ticket_dict["sender_type"]
+        ticket.response = ticket_dict.get("response", "")
+
         return ticket
-    
-    
+
     def __str__(self):
             return (
                 f"ID: {self.id}\n"

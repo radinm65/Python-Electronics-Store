@@ -1,29 +1,13 @@
 from datetime import datetime
 from IDGenerator import product_id_generator
 from FileCommands import FileCommands
-from Validator import Validator
 
 
 class Product:
-    def __init__(self, name, brand, price, category, seller_id, save):
+    def __init__(self, seller_id):
         self.id = product_id_generator.next_id()
-        self.name = name
-        self.brand = brand
-        self.price = price
-        self.category = category
         self.seller_id = seller_id
         self.__date_created = datetime.today()
-        if save:
-            new_product = {
-                "id": self.id,
-                "name": self.name,
-                "brand": self.brand,
-                "price": price,
-                "category": self.category,
-                "seller_id": self.seller_id,
-                "date_created": self.date_created.isoformat(),
-            }
-            FileCommands.add_data("./Database/UnapprovedProducts.json", new_product)
 
     @property
     def name(self):
@@ -31,7 +15,10 @@ class Product:
 
     @name.setter
     def name(self, new_name):
-        Validator.validate_product_name(new_name)
+        if len(new_name) < 3:
+            raise ValueError(
+                "Product name should be longer than 3 characters."
+            )
         self.__name = new_name
 
     @property
@@ -40,7 +27,15 @@ class Product:
 
     @brand.setter
     def brand(self, new_brand):
-        Validator.validate_brand(new_brand)
+        if len(new_brand) < 3:
+            raise ValueError(
+                "Brand should be longer than 3 characters."
+            )
+
+        if any(char.isdigit() for char in new_brand):
+            raise ValueError(
+                "Brand shouldn't have numbers."
+            )
         self.__brand = new_brand
 
     @property
@@ -49,8 +44,23 @@ class Product:
 
     @price.setter
     def price(self, new_price):
-        Validator.validate_price(new_price)
-        self.__price = float(new_price)
+        try:
+            new_price = float(new_price)
+        except ValueError:
+            raise ValueError(
+                "Price must be numeric."
+            )
+
+        if new_price <= 0:
+            raise ValueError(
+                "Price must be positive."
+            )
+
+        if new_price > 999999:
+            raise ValueError(
+                "Price can't be greater than 999999."
+            )
+        self.__price = new_price
 
     @property
     def category(self):
@@ -58,12 +68,32 @@ class Product:
 
     @category.setter
     def category(self, new_category):
-        Validator.validate_category(new_category)
+        if any(char.isdigit() for char in new_category):
+            raise ValueError(
+                "Category shouldn't have numbers."
+            )
+
+        if new_category not in ("Phone", "Laptop", "Camera"):
+            raise ValueError(
+                "Only Phone, Laptop and Camera categories are allowed."
+            )
         self.__category = new_category
-        
+
     @property
     def date_created(self):
         return self.__date_created
+
+    def save(self):
+        new_product = {
+            "id": self.id,
+            "name": self.name,
+            "brand": self.brand,
+            "price": self.price,
+            "category": self.category,
+            "seller_id": self.seller_id,
+            "date_created": self.date_created.isoformat(),
+        }
+        return FileCommands.add_data("./Database/UnapprovedProducts.json", new_product)
 
     @staticmethod
     def get_approved_products():
@@ -88,19 +118,16 @@ class Product:
             (product for product in products if product["id"] == product_id), None
         )
         return found_product
-    
+
     @staticmethod
     def from_dict(product_data):
-        product = Product(
-            product_data["name"],
-            product_data["brand"],
-            product_data["price"],
-            product_data["category"],
-            product_data["seller_id"],
-            save=False
-        )
+        product = Product(product_data["seller_id"])
         product.id = product_data["id"]
-        
+        product.name = product_data["name"]
+        product.brand = product_data["brand"]
+        product.price = product_data["price"]
+        product.category = product_data["category"]
+
         return product
 
     def __str__(self):

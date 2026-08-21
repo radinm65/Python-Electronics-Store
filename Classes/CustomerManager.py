@@ -1,21 +1,18 @@
 from Classes.Manager import Manager
 from FileCommands import FileCommands
 from Classes.CustomerEmployee import CustomerEmployee
-from Validator import Validator
 
 
 class CustomerManager(Manager):
-    def __init__(
-        self, firstname, lastname, username, password, age, phone_num, address
-    ):
-        super().__init__(
-            firstname, lastname, username, password, age, phone_num, address
-        )
 
     def raise_salary(customers_employee_id, amount):
-        
-        Validator.validate_raise_amount(amount)
-        
+
+        if not isinstance(amount, (int, float)):
+            raise ValueError("Amount must be numeric.")
+
+        if amount <= 0:
+            raise ValueError("Raise amount must be greater than zero.")
+
         customer_employees = CustomerManager.get_customer_employees()
         for ce in customer_employees:
             if ce["id"] == customers_employee_id:
@@ -24,28 +21,7 @@ class CustomerManager(Manager):
         return False
 
     @staticmethod
-    def hire_employee(
-        firstname,
-        lastname,
-        username,
-        password,
-        age,
-        phone_num,
-        address,
-        bank_account_num,
-        salary,
-    ):
-        new_customer = CustomerEmployee(
-            firstname,
-            lastname,
-            username,
-            password,
-            age,
-            phone_num,
-            address,
-            bank_account_num,
-            salary
-        )
+    def hire_employee(new_customer):
         json_customer = {
             "id": new_customer.id,
             "firstname": new_customer.firstname,
@@ -68,7 +44,7 @@ class CustomerManager(Manager):
     @staticmethod
     def get_customer_employees():
         return FileCommands.get_file_data("./Database/CustomerEmployees.json")
-    
+
     @staticmethod
     def get_customer_employee_byID(customer_employee_id):
         customer_employees = CustomerManager.get_customer_employees()
@@ -81,7 +57,7 @@ class CustomerManager(Manager):
     @staticmethod
     def save_customer_employees(customer_employees):
         return FileCommands.save_file_data("./Database/CustomerEmployees.json", customer_employees)
-    
+
     @staticmethod
     def check_employee_byID(emp_id):
         customer_employees = CustomerManager.get_customer_employees()

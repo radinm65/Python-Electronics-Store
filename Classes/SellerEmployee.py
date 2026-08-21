@@ -5,29 +5,8 @@ from IDGenerator import seller_employee_id_generator
 
 
 class SellerEmployee(Employee):
-    def __init__(
-        self,
-        firstname,
-        lastname,
-        username,
-        password,
-        age,
-        phone_num,
-        address,
-        bank_account,
-        salary,
-    ):
-        super().__init__(
-            firstname,
-            lastname,
-            username,
-            password,
-            age,
-            phone_num,
-            address,
-            bank_account,
-            salary,
-        )
+    def __init__(self):
+        super().__init__()
         self.id = seller_employee_id_generator.next_id()
 
     @staticmethod
@@ -89,8 +68,8 @@ class SellerEmployee(Employee):
     @staticmethod
     def remove_product(product_id):
         return FileCommands.delete_data("./Database/ApprovedProducts.json", product_id)
-    
-    
+
+
     @staticmethod
     def answer_ticket(ticket_id, answer):
         seller_tickets = Ticket.get_sendertype_tickets("seller")
@@ -117,19 +96,17 @@ class SellerEmployee(Employee):
 
     @classmethod
     def from_dict(cls, data):
-        seller_employee = cls(
-            data["firstname"],
-            data["lastname"],
-            data["username"],
-            "Temp123!45",
-            str(data["age"]),
-            data["phone_num"],
-            data["address"],
-            data["bank_account_num"],
-            data["salary"],
-        )
-        seller_employee.set_hashed_password(data["password"])
+        seller_employee = cls()
         seller_employee.id = data["id"]
+        seller_employee.firstname = data["firstname"]
+        seller_employee.lastname = data["lastname"]
+        seller_employee.username = data["username"]
+        seller_employee.set_hashed_password(data["password"])
+        seller_employee.age = str(data["age"])
+        seller_employee.phone_num = data["phone_num"]
+        seller_employee.address = data["address"]
+        seller_employee.bank_account_num = data["bank_account_num"]
+        seller_employee.salary = data["salary"]
         seller_employee.date_hired = data["date_hired"]
 
         return seller_employee

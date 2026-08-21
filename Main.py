@@ -9,7 +9,6 @@ from Classes.SellerEmployee import SellerEmployee
 from Classes.Product import Product
 from Classes.Ticket import Ticket
 from Report import Report
-from Validator import Validator
 
 
 def print_error(message):
@@ -184,58 +183,35 @@ def hire_employee(employee_type):
                 print_successful("Exited Hiring!\n")
                 return True
 
-            Validator.validate_firstname(firstname)
+            if employee_type == "customer":
+                new_employee = CustomerEmployee()
+            else:
+                new_employee = SellerEmployee()
 
-            lastname = input("Enter Lastname:\n")
-            Validator.validate_lastname(lastname)
+            new_employee.firstname = firstname
 
-            username = input("Enter Username:\n")
-            Validator.validate_username(username)
+            new_employee.lastname = input("Enter Lastname:\n")
 
-            password = input("Enter Password:\n")
-            Validator.validate_password(password)
+            new_employee.username = input("Enter Username:\n")
 
-            age = input("Enter age:\n")
-            Validator.validate_age(age)
+            new_employee.password = input("Enter Password:\n")
 
-            phone_num = input("Enter Phone number:\n")
-            Validator.validate_phone(phone_num)
+            new_employee.age = input("Enter age:\n")
 
-            address = input("Enter Address:\n")
-            Validator.validate_address(address)
+            new_employee.phone_num = input("Enter Phone number:\n")
 
-            bank_account_num = input("Enter Bank Account Number:\n")
-            Validator.validate_bank_account(bank_account_num)
+            new_employee.address = input("Enter Address:\n")
 
-            salary = int(input("Enter Salary:\n"))
-            Validator.validate_salary(salary)
+            new_employee.bank_account_num = input("Enter Bank Account Number:\n")
+
+            new_employee.salary = int(input("Enter Salary:\n"))
 
             if employee_type == "customer":
-                CustomerManager.hire_employee(
-                    firstname,
-                    lastname,
-                    username,
-                    password,
-                    age,
-                    phone_num,
-                    address,
-                    bank_account_num,
-                    salary,
-                )
+                CustomerManager.hire_employee(new_employee)
                 print_successful("Customer Employee has Been Hired Successfully!")
 
             elif employee_type == "seller":
-                SellerManager.hire_employee(
-                    firstname,
-                    lastname,
-                    username,
-                    password,
-                    age,
-                    phone_num,
-                    address,
-                    bank_account_num,
-                    salary,
-                )
+                SellerManager.hire_employee(new_employee)
                 print_successful("Seller Employee has Been Hired Successfully!")
 
             break
@@ -330,7 +306,6 @@ def show_all_users(user_type):
         print_error(f"No {user_type}s have been registered.")
         return
 
-    
     for user in users:
         print(colorama.Fore.BLUE)
         if user_type == "customer":
@@ -488,13 +463,16 @@ def signup_user(signup_type):
             print_successful("Exited signup!\n")
             return False, None
 
-        Validator.validate_firstname(firstname)
+        if signup_type == "customer":
+            user = Customer()
+        elif signup_type == "seller":
+            user = Seller()
 
-        lastname = input("Enter Lastname:\n")
-        Validator.validate_lastname(lastname)
+        user.firstname = firstname
+
+        user.lastname = input("Enter Lastname:\n")
 
         username = input("Enter Username:\n")
-        Validator.validate_username(username)
 
         if signup_type == "customer":
             for customer in CustomerEmployee.get_customers():
@@ -505,42 +483,22 @@ def signup_user(signup_type):
                 if seller["username"] == username:
                     raise ValueError("Username already exists.")
 
-        password = input("Enter Password:\n")
-        Validator.validate_password(password)
+        user.username = username
 
-        age = input("Enter age:\n")
-        Validator.validate_age(age)
+        user.password = input("Enter Password:\n")
 
-        phone_num = input("Enter Phone number:\n")
-        Validator.validate_phone(phone_num)
+        user.age = input("Enter age:\n")
 
-        address = input("Enter Address:\n")
-        Validator.validate_address(address)
+        user.phone_num = input("Enter Phone number:\n")
+
+        user.address = input("Enter Address:\n")
+
+        user.save()
 
         if signup_type == "customer":
-            user = Customer(
-                firstname,
-                lastname,
-                username,
-                password,
-                age,
-                phone_num,
-                address,
-                save=True,
-            )
             print_successful("Customer Signed up Successfully!")
 
         elif signup_type == "seller":
-            user = Seller(
-                firstname,
-                lastname,
-                username,
-                password,
-                age,
-                phone_num,
-                address,
-                save=True,
-            )
             print_successful(
                 "Seller signed up Successfully!\nAfter Being Approved, you can signin"
             )
@@ -698,9 +656,11 @@ def add_cart_to_favorites(customer):
 
 def submit_ticket(user, sender_type):
     try:
-        request = input("What is the problem?\n")
-        Validator.validate_ticket_request(request)
-        new_ticket = Ticket(user.firstname, user.id, request, sender_type, True)
+        new_ticket = Ticket(user.id)
+        new_ticket.from_name = user.firstname
+        new_ticket.request = input("What is the problem?\n")
+        new_ticket.sender_type = sender_type
+        new_ticket.save()
         print_successful("New Ticket Submitted")
     except ValueError as e:
         print_error(e)
@@ -723,8 +683,9 @@ def see_user_tickets(user, sender_type):
 def add_to_balance(user):
     try:
         add_balance = int(input("Enter amount to add to balance:\n"))
-        Validator.validate_balance(add_balance)
-        if Customer.add_to_balance(user.id, add_balance):
+        customer = Customer.from_dict(CustomerEmployee.get_customer_byID(user.id))
+        customer.balance = customer.balance + add_balance
+        if Customer.add_to_balance(user.id, customer.balance):
             print_successful(f"Balance was added.")
         else:
             print_error("Error in adding balance.")
@@ -761,26 +722,23 @@ def make_product(seller):
                 print_successful("Exited registering product!\n")
                 break
 
-            Validator.validate_product_name(name)
+            new_product = Product(seller.id)
+            new_product.name = name
 
-            brand = input("\nEnter brand:\n")
-            Validator.validate_brand(brand)
+            new_product.brand = input("\nEnter brand:\n")
 
-            price = input("\nEnter price:\n")
-            Validator.validate_price(price)
+            new_product.price = input("\nEnter price:\n")
 
-            category = input("\nEnter category: (Phone, Laptop, Camera)\n")
-            Validator.validate_category(category)
+            new_product.category = input("\nEnter category: (Phone, Laptop, Camera)\n")
 
-            new_product = Product(name, brand, price, category, seller.id, True)
+            new_product.save()
 
-            if new_product:
-                print_successful(
-                    f"Product with ID {new_product.id} has been made and has to be approved.\n"
-                )
-                register_again = input("Register another?\n1- Yes\n")
-                if register_again != "1":
-                    break
+            print_successful(
+                f"Product with ID {new_product.id} has been made and has to be approved.\n"
+            )
+            register_again = input("Register another?\n1- Yes\n")
+            if register_again != "1":
+                break
 
         except ValueError as e:
             print_error(e)
@@ -844,7 +802,7 @@ def delete_product_from_seller(seller):
             print_error(e)
 
 
-def edit_product(seller = None):
+def edit_product(seller=None):
     while True:
         try:
             product_id = input("\nEnter Product ID to edit (Enter 'e' to exit):\n")
@@ -872,7 +830,8 @@ def edit_product(seller = None):
                     print_error("Invalid ID.")
                     continue
 
-            product = Product.get_product_byID(product_id)
+            product_data = Product.get_product_byID(product_id)
+            product = Product.from_dict(product_data)
 
             print(
                 "\nWhich field do you want to edit?\n"
@@ -886,30 +845,32 @@ def edit_product(seller = None):
 
             match choice:
                 case "1":
-                    new_name = input("Enter new name:\n")
-                    Validator.validate_product_name(new_name)
-                    product["name"] = new_name
+                    product.name = input("Enter new name:\n")
 
                 case "2":
-                    new_brand = input("Enter new brand:\n")
-                    Validator.validate_brand(new_brand)
-                    product["brand"] = new_brand
+                    product.brand = input("Enter new brand:\n")
 
                 case "3":
-                    new_price = input("Enter new price:\n")
-                    Validator.validate_price(new_price)
-                    product["price"] = int(new_price)
+                    product.price = input("Enter new price:\n")
 
                 case "4":
-                    new_category = input("Enter new category:\n")
-                    Validator.validate_category(new_category)
-                    product["category"] = new_category
+                    product.category = input("Enter new category:\n")
 
                 case _:
                     print_error("Invalid choice.\n")
                     continue
 
-            if Product.edit_product(product):
+            edited_product = {
+                "id": product.id,
+                "name": product.name,
+                "brand": product.brand,
+                "price": product.price,
+                "category": product.category,
+                "seller_id": product.seller_id,
+                "date_created": product_data["date_created"],
+            }
+
+            if Product.edit_product(edited_product):
                 print_successful("Product was edited successfully!\n")
                 again = input("Do you want to edit another product?\n1- Yes\n")
                 if again != "1":
@@ -1023,7 +984,7 @@ def approve_product_or_seller(product_or_seller):
         try:
             if product_or_seller == "product":
                 show_unapproved_products()
-                
+
             print(colorama.Fore.WHITE)
             product_or_seller_id = int(
                 input(f"Enter {product_or_seller} ID to approve:\n")
@@ -1059,16 +1020,17 @@ def remove_seller_or_product(product_or_seller):
                 if again != 1:
                     break
         except ValueError as e:
-            print_error(e, end = "\n\n")
-            
+            print_error(e, end="\n\n")
+
+
 def show_all_products():
     all_products = Product.get_approved_products()
     print(colorama.Fore.BLUE)
     print("\n======= All products =======\n")
     for product in all_products:
         print(Product.from_dict(product), end="\n--------------------\n")
-        
-        
+
+
 @staticmethod
 def filter_products():
 
@@ -1094,7 +1056,7 @@ def filter_products():
                     filtered_products = list(
                         filter(
                             lambda product: name.lower() in product["name"].lower(),
-                            products
+                            products,
                         )
                     )
 
@@ -1104,7 +1066,7 @@ def filter_products():
                     filtered_products = list(
                         filter(
                             lambda product: brand.lower() in product["brand"].lower(),
-                            products
+                            products,
                         )
                     )
 
@@ -1113,8 +1075,9 @@ def filter_products():
 
                     filtered_products = list(
                         filter(
-                            lambda product: category.lower() == product["category"].lower(),
-                            products
+                            lambda product: category.lower()
+                            == product["category"].lower(),
+                            products,
                         )
                     )
 
@@ -1124,9 +1087,8 @@ def filter_products():
 
                     filtered_products = list(
                         filter(
-                            lambda product:
-                            min_price <= product["price"] <= max_price,
-                            products
+                            lambda product: min_price <= product["price"] <= max_price,
+                            products,
                         )
                     )
 
@@ -1147,8 +1109,8 @@ def filter_products():
 
         except ValueError as e:
             print_error(e)
-            
-            
+
+
 import csv
 
 
@@ -1156,14 +1118,8 @@ import csv
 def export_customer_or_seller(employee_type):
 
     data = {
-        "customer": {
-            "file": CustomerEmployee.get_customers,
-            "name": "Customers"
-        },
-        "seller": {
-            "file": SellerEmployee.get_sellers,
-            "name": "Sellers"
-        }
+        "customer": {"file": CustomerEmployee.get_customers, "name": "Customers"},
+        "seller": {"file": SellerEmployee.get_sellers, "name": "Sellers"},
     }
 
     if employee_type not in data:
@@ -1178,12 +1134,7 @@ def export_customer_or_seller(employee_type):
 
     while True:
         try:
-            print(
-                "\nExport As:\n"
-                "1- CSV\n"
-                "2- TXT\n"
-                "3- Exit"
-            )
+            print("\nExport As:\n" "1- CSV\n" "2- TXT\n" "3- Exit")
 
             choice = input("Please choose:\n")
 
@@ -1194,17 +1145,12 @@ def export_customer_or_seller(employee_type):
                 fieldnames = users[0].keys()
 
                 with open(filename, "w", newline="", encoding="utf-8") as file:
-                    writer = csv.DictWriter(
-                        file,
-                        fieldnames=fieldnames
-                    )
+                    writer = csv.DictWriter(file, fieldnames=fieldnames)
 
                     writer.writeheader()
                     writer.writerows(users)
 
-                print_successful(
-                    f"{user_data['name']} exported successfully to CSV."
-                )
+                print_successful(f"{user_data['name']} exported successfully to CSV.")
 
                 return True
 
@@ -1221,9 +1167,7 @@ def export_customer_or_seller(employee_type):
 
                         file.write("\n")
 
-                print_successful(
-                    f"{user_data['name']} exported successfully to TXT."
-                )
+                print_successful(f"{user_data['name']} exported successfully to TXT.")
 
                 return True
 
@@ -1235,6 +1179,7 @@ def export_customer_or_seller(employee_type):
 
         except ValueError as e:
             print_error(e)
+
 
 # Panels -----------------------------------------------------------------
 
@@ -1491,7 +1436,7 @@ def show_employee_manager_panel(manager, employee_type):
 
             case "7":
                 export_customer_or_seller(employee_type)
-                
+
             case "8":
                 show_manager_account_info(manager)
 
@@ -1528,25 +1473,23 @@ def employee_Ticket_panel(user, employee_type, sender_type):
 
 def main():
 
-    customersManager = CustomerManager(
-        "Radin",
-        "Motahhary",
-        "radinm123",
-        "Radinian@123",
-        "21",
-        "9379499511",
-        "Karaj_ mehrshahr",
-    )
+    customersManager = CustomerManager()
+    customersManager.firstname = "Radin"
+    customersManager.lastname = "Motahhary"
+    customersManager.username = "radinm123"
+    customersManager.password = "Radinian@123"
+    customersManager.age = "21"
+    customersManager.phone_num = "9379499511"
+    customersManager.address = "Karaj_ mehrshahr"
 
-    sellersManager = SellerManager(
-        "Radin",
-        "Motahhary",
-        "radinm123",
-        "Radinian@123",
-        "21",
-        "9379499511",
-        "Karaj_ mehrshahr",
-    )
+    sellersManager = SellerManager()
+    sellersManager.firstname = "Radin"
+    sellersManager.lastname = "Motahhary"
+    sellersManager.username = "radinm123"
+    sellersManager.password = "Radinian@123"
+    sellersManager.age = "21"
+    sellersManager.phone_num = "9379499511"
+    sellersManager.address = "Karaj_ mehrshahr"
 
     managers = {"customer": customersManager, "seller": sellersManager}
 

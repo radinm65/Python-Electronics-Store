@@ -1,20 +1,17 @@
 from Classes.Manager import Manager
 from Classes.SellerEmployee import SellerEmployee
 from FileCommands import FileCommands
-from Validator import Validator
 
 
 class SellerManager(Manager):
-    def __init__(
-        self, firstname, lastname, username, password, age, phone_num, address
-    ):
-        super().__init__(
-            firstname, lastname, username, password, age, phone_num, address
-        )
 
     def raise_salary(seller_employee_id, amount):
 
-        Validator.validate_raise_amount(amount)
+        if not isinstance(amount, (int, float)):
+            raise ValueError("Amount must be numeric.")
+
+        if amount <= 0:
+            raise ValueError("Raise amount must be greater than zero.")
 
         seller_employees = SellerManager.get_seller_employees()
         for se in seller_employees:
@@ -24,28 +21,7 @@ class SellerManager(Manager):
         return False
 
     @staticmethod
-    def hire_employee(
-        firstname,
-        lastname,
-        username,
-        password,
-        age,
-        phone_num,
-        address,
-        bank_account_num,
-        salary,
-    ):
-        new_employee = SellerEmployee(
-            firstname,
-            lastname,
-            username,
-            password,
-            age,
-            phone_num,
-            address,
-            bank_account_num,
-            salary,
-        )
+    def hire_employee(new_employee):
         json_employee = {
             "id": new_employee.id,
             "firstname": new_employee.firstname,

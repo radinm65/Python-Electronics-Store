@@ -4,29 +4,8 @@ from FileCommands import FileCommands
 from IDGenerator import customer_employee_id_generator
 
 class CustomerEmployee(Employee):
-    def __init__(
-        self,
-        firstname,
-        lastname,
-        username,
-        password,
-        age,
-        phone_num,
-        address,
-        bank_account_num,
-        salary
-    ):
-        super().__init__(
-            firstname,
-            lastname,
-            username,
-            password,
-            age,
-            phone_num,
-            address,
-            bank_account_num,
-            salary
-        )
+    def __init__(self):
+        super().__init__()
         self.id = customer_employee_id_generator.next_id()
 
 
@@ -41,12 +20,12 @@ class CustomerEmployee(Employee):
             (customer for customer in customers if customer["id"] == customer_id), None
         )
         return found_customer
-    
-    
+
+
     @staticmethod
     def delete_customer(customer_id):
         return FileCommands.delete_data("./Database/Customers.json", customer_id)
-    
+
     @staticmethod
     def answer_ticket(ticket_id, answer):
         customer_tickets = Ticket.get_sendertype_tickets("customer")
@@ -56,30 +35,28 @@ class CustomerEmployee(Employee):
                     ticket["response"] = answer
                     return FileCommands.edit_data("./Database/Tickets.json", ticket)
                 else:
-                    raise ValueError("Ticket already has a response")    
+                    raise ValueError("Ticket already has a response")
         return False
-    
-    
+
+
     @classmethod
     def from_dict(cls, data):
-        customer_employee = cls(
-            data["firstname"],
-            data["lastname"],
-            data["username"],
-            "Temp123!45",
-            str(data["age"]),
-            data["phone_num"],
-            data["address"],
-            data["bank_account_num"],
-            data["salary"],
-        )
-        customer_employee.set_hashed_password(data["password"])
+        customer_employee = cls()
         customer_employee.id = data["id"]
+        customer_employee.firstname = data["firstname"]
+        customer_employee.lastname = data["lastname"]
+        customer_employee.username = data["username"]
+        customer_employee.set_hashed_password(data["password"])
+        customer_employee.age = str(data["age"])
+        customer_employee.phone_num = data["phone_num"]
+        customer_employee.address = data["address"]
+        customer_employee.bank_account_num = data["bank_account_num"]
+        customer_employee.salary = data["salary"]
         customer_employee.date_hired = data["date_hired"]
 
         return customer_employee
-    
-    
+
+
     def __str__(self):
         return (
             f"Firstname: {self.firstname}\n"

@@ -1,29 +1,23 @@
 from abc import ABC
-from datetime import datetime
+import re
 import hashlib
-from Validator import Validator
 from FileCommands import FileCommands
 
 
 class Person(ABC):
-    def __init__(
-        self, firstname, lastname, username, password, age, phone_num, address
-    ):
-        self.firstname = firstname
-        self.lastname = lastname
-        self.username = username
-        self.password = password
-        self.age = age
-        self.phone_num = phone_num
-        self.address = address
-        
+
     @property
     def firstname(self):
         return self.__firstname
 
     @firstname.setter
     def firstname(self, new_firstname):
-        Validator.validate_firstname(new_firstname)
+        if len(new_firstname) < 3:
+            raise ValueError("Firstname can't be shorter than 3 characters.")
+
+        if any(char.isdigit() for char in new_firstname):
+            raise ValueError("Firstname shouldn't have numbers.")
+
         self.__firstname = new_firstname
 
     @property
@@ -32,7 +26,12 @@ class Person(ABC):
 
     @lastname.setter
     def lastname(self, new_lastname):
-        Validator.validate_lastname(new_lastname)
+        if len(new_lastname) < 3:
+            raise ValueError("Lastname can't be shorter than 3 characters.")
+
+        if any(char.isdigit() for char in new_lastname):
+            raise ValueError("Lastname shouldn't have numbers.")
+
         self.__lastname = new_lastname
 
     @property
@@ -41,7 +40,12 @@ class Person(ABC):
 
     @username.setter
     def username(self, value):
-        Validator.validate_username(value)
+        if len(value) < 5:
+            raise ValueError("Username can't be shorter than 5 characters.")
+
+        if not any(char.isdigit() for char in value):
+            raise ValueError("Username should have numbers.")
+
         self.__username = value
 
     @property
@@ -50,9 +54,20 @@ class Person(ABC):
 
     @password.setter
     def password(self, new_password):
-        Validator.validate_password(new_password)
+        if len(new_password) < 8:
+            raise ValueError("Password too short.")
+
+        if sum(char.isdigit() for char in new_password) < 3:
+            raise ValueError("Password needs 3 numbers.")
+
+        if not new_password[0].isupper():
+            raise ValueError("Password needs capital letter.")
+
+        if not re.search(r"[^a-zA-Z0-9]", new_password):
+            raise ValueError("Password needs special character.")
+
         self.__password = hashlib.sha256(new_password.encode()).hexdigest()
-        
+
     def set_hashed_password(self, hashed_password):
         self.__password = hashed_password
 
@@ -62,8 +77,11 @@ class Person(ABC):
 
     @age.setter
     def age(self, new_age):
+        if not new_age.isdigit():
+            raise ValueError("Age must be numeric.")
 
-        Validator.validate_age(new_age)
+        if int(new_age) > 80:
+            raise ValueError("Age cannot be above 80.")
 
         self.__age = int(new_age)
 
@@ -73,8 +91,11 @@ class Person(ABC):
 
     @phone_num.setter
     def phone_num(self, new_num):
+        if len(new_num) != 10:
+            raise ValueError("Phone must have 10 digits.")
 
-        Validator.validate_phone(new_num)
+        if not new_num.isdigit():
+            raise ValueError("Phone must be numeric.")
 
         self.__phone_num = new_num
 
@@ -84,25 +105,23 @@ class Person(ABC):
 
     @address.setter
     def address(self, value):
-
-        Validator.validate_address(value)
+        if len(value) < 10:
+            raise ValueError("Address is too short.")
 
         self.__address = value
-        
-        
+
     def get_hash_Password(password):
         return hashlib.sha256(password.encode()).hexdigest()
-        
-    @staticmethod    
+
+    @staticmethod
     def check_login(file_path, input_username, input_password):
         hashed_password = hashlib.sha256(input_password.encode()).hexdigest()
         get_users = FileCommands.get_file_data(file_path)
-        
-        if len(get_users) == 0 :
+
+        if len(get_users) == 0:
             raise ValueError("No users of this type have been registered yet")
         for user in get_users:
             if hashed_password == user["password"] and input_username == user["username"]:
                 return True, user
-            
-        return False, None
 
+        return False, None

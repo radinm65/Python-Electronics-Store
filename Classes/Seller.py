@@ -6,31 +6,27 @@ from FileCommands import FileCommands
 
 
 class Seller(User):
-    def __init__(
-        self, firstname, lastname, username, password, age, phone_num, address, save
-    ):
-        super().__init__(
-            firstname, lastname, username, password, age, phone_num, address
-        )
+    def __init__(self):
+        super().__init__()
         self.id = seller_id_generator.next_id()
         self.selling_products = []
         self.sold = []
-        if save:
-            new_seller = {
-                "id": self.id,
-                "firstname": self.firstname,
-                "lastname": self.lastname,
-                "username": self.username,
-                "password": self.password,
-                "age": self.age,
-                "phone_num": self.phone_num,
-                "address": self.address,
-                "balance": self.balance,
-                "selling_products": self.selling_products,
-                "sold": self.sold,
-            }
-            FileCommands.add_data("./Database/UnapprovedSellers.json", new_seller)
 
+    def save(self):
+        new_seller = {
+            "id": self.id,
+            "firstname": self.firstname,
+            "lastname": self.lastname,
+            "username": self.username,
+            "password": self.password,
+            "age": self.age,
+            "phone_num": self.phone_num,
+            "address": self.address,
+            "balance": self.balance,
+            "selling_products": self.selling_products,
+            "sold": self.sold,
+        }
+        return FileCommands.add_data("./Database/UnapprovedSellers.json", new_seller)
 
     def get_seller_unapproved_products(self):
         seller_unapproved_products = []
@@ -43,27 +39,22 @@ class Seller(User):
         return seller_unapproved_products
 
 
-    
     @staticmethod
     def delete_product_from_seller(seller_json, product_id):
         seller_json["selling_products"] = [product_id_json for product_id_json in seller_json["selling_products"] if product_id_json != product_id]
         return FileCommands.edit_data("./Database/Sellers.json", seller_json)
-        
+
     @classmethod
     def from_dict(cls, data):
-        seller = cls(
-            data["firstname"],
-            data["lastname"],
-            data["username"],
-            "Temp123!45",
-            str(data["age"]),
-            data["phone_num"],
-            data["address"],
-            save=False,
-        )
-
-        seller.set_hashed_password(data["password"])
+        seller = cls()
         seller.id = data["id"]
+        seller.firstname = data["firstname"]
+        seller.lastname = data["lastname"]
+        seller.username = data["username"]
+        seller.set_hashed_password(data["password"])
+        seller.age = str(data["age"])
+        seller.phone_num = data["phone_num"]
+        seller.address = data["address"]
         seller.balance = data["balance"]
         seller.selling_products = data["selling_products"]
         seller.sold = data["sold"]

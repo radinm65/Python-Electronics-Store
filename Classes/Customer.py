@@ -7,32 +7,29 @@ from datetime import datetime
 
 
 class Customer(User):
-    def __init__(
-        self, firstname, lastname, username, password, age, phone_num, address, save
-    ):
-        super().__init__(
-            firstname, lastname, username, password, age, phone_num, address
-        )
+    def __init__(self):
+        super().__init__()
         self.id = customer_id_generator.next_id()
         self.cart = []
         self.favorites = []
         self.bought = []
-        if save:
-            new_customer = {
-                "id": self.id,
-                "firstname": self.firstname,
-                "lastname": self.lastname,
-                "username": self.username,
-                "password": self.password,
-                "age": self.age,
-                "phone_num": self.phone_num,
-                "address": self.address,
-                "balance": self.balance,
-                "cart": self.cart,
-                "favorites": self.favorites,
-                "bought": self.bought,
-            }
-            FileCommands.add_data("./Database/Customers.json", new_customer)
+
+    def save(self):
+        new_customer = {
+            "id": self.id,
+            "firstname": self.firstname,
+            "lastname": self.lastname,
+            "username": self.username,
+            "password": self.password,
+            "age": self.age,
+            "phone_num": self.phone_num,
+            "address": self.address,
+            "balance": self.balance,
+            "cart": self.cart,
+            "favorites": self.favorites,
+            "bought": self.bought,
+        }
+        return FileCommands.add_data("./Database/Customers.json", new_customer)
 
 
 
@@ -145,8 +142,8 @@ class Customer(User):
                     "./Database/Customers.json", customers
                 )
         return False
-    
-    
+
+
     @staticmethod
     def add_cart_to_favorites(customer_id):
 
@@ -160,10 +157,10 @@ class Customer(User):
                     raise ValueError("Favorites is empty.")
 
                 for product_id in customer["favorites"]:
-                    
+
                     if product_id not in customer["cart"]:
                         customer["cart"].append(product_id)
-                    
+
                 customer["favorites"] = []
 
                 return FileCommands.save_file_data(
@@ -172,9 +169,9 @@ class Customer(User):
                 )
 
         return False
-    
+
     @staticmethod
-    def add_to_balance(customer_id, balance):
+    def add_to_balance(customer_id, new_balance):
 
         customers = Customer.get_customers()
 
@@ -182,7 +179,7 @@ class Customer(User):
 
             if customer["id"] == customer_id:
 
-                customer["balance"] += balance
+                customer["balance"] = new_balance
 
                 return FileCommands.save_file_data(
                     "./Database/Customers.json",
@@ -193,19 +190,15 @@ class Customer(User):
 
     @staticmethod
     def from_dict(data):
-        customer = Customer(
-            data["firstname"],
-            data["lastname"],
-            data["username"],
-            "Temp123!45",
-            str(data["age"]),
-            data["phone_num"],
-            data["address"],
-            False,
-        )
-
-        customer.set_hashed_password(data["password"])
+        customer = Customer()
         customer.id = data["id"]
+        customer.firstname = data["firstname"]
+        customer.lastname = data["lastname"]
+        customer.username = data["username"]
+        customer.set_hashed_password(data["password"])
+        customer.age = str(data["age"])
+        customer.phone_num = data["phone_num"]
+        customer.address = data["address"]
         customer.balance = data["balance"]
         customer.cart = data["cart"]
         customer.favorites = data["favorites"]
@@ -227,5 +220,3 @@ class Customer(User):
             f"Favorites: {self.favorites}\n"
             f"Bought: {self.bought}\n"
         )
-
-    

@@ -68,26 +68,6 @@ class Product(ABC):
     def date_created(self):
         return self.__date_created
 
-    @property
-    @abstractmethod
-    def category(self):
-        raise NotImplementedError
-
-    @abstractmethod
-    def extra_fields(self):
-        """Return a dict of this product type's extra field name -> value."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def input_extra_fields(self):
-        """Prompt for and set this product type's extra fields on self."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def edit_extra_field(self):
-        """Show a submenu of this product type's extra fields and edit one."""
-        raise NotImplementedError
-
     def save(self):
         new_product = {
             "id": self.id,
